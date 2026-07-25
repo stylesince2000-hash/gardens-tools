@@ -10,142 +10,108 @@
 <meta name="theme-color" content="#f2f2f7">
 <style>
   :root{
-    --blue:#007aff;
-    --brown:#8a6d4f;
-    --bg:#f2f2f7;
-    --card:#ffffff;
-    --sep:#e5e5ea;
-    --ink:#1c1c1e;
-    --gray:#8e8e93;
-    --red:#ff3b30;
-    --tabbar:76px;
+    --blue:#007aff; --brown:#8a6d4f; --bg:#f2f2f7; --card:#ffffff;
+    --sep:#e5e5ea; --ink:#1c1c1e; --gray:#8e8e93; --red:#ff3b30; --tabbar:76px;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;height:100%;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN",system-ui,sans-serif;
     background:var(--bg); color:var(--ink);
-    -webkit-user-select:none; user-select:none;
-    touch-action:manipulation;
-    overscroll-behavior:none;
+    -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+    touch-action:manipulation; overscroll-behavior:none;
   }
   .panel{
-    display:none;
-    position:fixed; inset:0;
+    display:none; position:fixed; inset:0;
     padding-top:env(safe-area-inset-top);
     padding-bottom:calc(var(--tabbar) + env(safe-area-inset-bottom));
     overflow-y:auto; -webkit-overflow-scrolling:touch;
   }
   .panel.active{display:block;}
 
-  /* ---------- Counter ---------- */
+  /* Counter */
   #tab-counter{display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
   #tab-counter.active{display:flex;}
   .ct-label{color:var(--gray); font-size:20px; margin-bottom:24px;}
   .ct-num{font-size:96px; font-weight:800; line-height:1; letter-spacing:-2px;}
   .ct-btns{display:flex; gap:44px; margin-top:40px;}
-  .ct-btn{
-    width:64px;height:64px;border-radius:50%;border:none;background:var(--blue);color:#fff;
-    font-size:34px; font-weight:400; display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-  }
+  .ct-btn{width:64px;height:64px;border-radius:50%;border:none;background:var(--blue);color:#fff;
+    font-size:34px; display:flex;align-items:center;justify-content:center; cursor:pointer;}
   .ct-btn:active{opacity:.7; transform:scale(.94);}
   .ct-when{margin-top:36px;color:var(--gray);font-size:15px;}
 
-  /* ---------- shared header ---------- */
+  /* header */
   .hdr{padding:8px 18px 4px;}
   .hdr-row{display:flex;align-items:center;justify-content:space-between;min-height:34px;}
   .hdr-title{font-size:34px;font-weight:800;letter-spacing:-.5px;margin:2px 0 12px;}
   .hbtn{background:none;border:none;color:var(--blue);font-size:17px;padding:6px 2px;cursor:pointer;}
   .hbtn.plus{font-size:30px;font-weight:300;line-height:1;}
+  .hint{color:var(--gray);font-size:12.5px;padding:0 18px 8px;}
 
-  /* ---------- list ---------- */
-  .list{
-    background:var(--card); border-radius:12px; margin:0 16px;
-    overflow:hidden;
+  /* list */
+  .list{background:var(--card); border-radius:12px; margin:0 16px; overflow:hidden;}
+  .row{position:relative; background:var(--card); overflow:hidden;}
+  .row.dragging{z-index:5; box-shadow:0 10px 26px rgba(0,0,0,.18); border-radius:10px; overflow:visible;}
+  .cell{
+    position:relative; z-index:1; background:var(--card);
+    display:flex; align-items:center; gap:12px; padding:15px 16px;
+    -webkit-touch-callout:none;
   }
-  .row{
-    display:flex; align-items:center; gap:12px;
-    padding:14px 16px; background:var(--card);
-    position:relative;
+  .row:not(:last-child) .cell::after{
+    content:""; position:absolute; left:0; right:-16px; bottom:0; height:1px; background:var(--sep);
   }
-  .row:not(:last-child)::after{
-    content:""; position:absolute; left:16px; right:0; bottom:0; height:1px; background:var(--sep);
-  }
-  .row.dragging{background:#fafafa; box-shadow:0 8px 24px rgba(0,0,0,.16); border-radius:10px; z-index:5;}
-  .row.dragging::after{display:none;}
-  .list.sorting .row{transition:none;}
+  .row.dragging .cell::after{display:none;}
 
   .link-name{color:var(--brown); font-size:18px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .chev{color:#c7c7cc; font-size:20px;}
-
   .todo-text{flex:1; font-size:18px; min-width:0; word-break:break-word;}
-  .todo-text.done{color:var(--gray); text-decoration:line-through;}
 
-  .circle{
-    width:26px;height:26px;border-radius:50%;border:2px solid #c7c7cc;flex:0 0 auto;
-    display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;padding:0;
-  }
-  .circle.on{background:var(--blue);border-color:var(--blue);}
-  .circle.on svg{display:block;}
-  .circle svg{display:none;width:15px;height:15px;}
+  /* swipe actions (web) */
+  .actions{position:absolute; top:0; right:0; bottom:0; display:flex; z-index:0;}
+  .act{border:none; color:#fff; font-size:16px; width:76px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .act.edit{background:#5e5ce6;}
+  .act.del{background:var(--red);}
 
-  .del{
-    width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;border:none;
-    display:flex;align-items:center;justify-content:center;flex:0 0 auto;cursor:pointer;font-size:22px;line-height:1;
-  }
-  .del svg{width:12px;height:2px;}
-  .handle{
-    color:#c7c7cc; flex:0 0 auto; padding:6px; margin:-6px -6px -6px 0;
-    touch-action:none; cursor:grab; display:flex;align-items:center;
-  }
+  /* swipe-to-delete bg (todo) */
+  .delbg{position:absolute; inset:0; background:var(--red); display:flex; align-items:center; justify-content:flex-end;
+    padding-right:24px; color:#fff; z-index:0; font-size:16px;}
+
   .empty{color:var(--gray);text-align:center;font-size:16px;padding:40px 20px;}
 
-  /* ---------- tab bar ---------- */
-  .tabbar{
-    position:fixed; left:0; right:0; bottom:0; z-index:20;
+  /* tab bar */
+  .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:20;
     height:calc(var(--tabbar) + env(safe-area-inset-bottom));
     padding-bottom:env(safe-area-inset-bottom);
     background:rgba(249,249,249,.94); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
-    border-top:1px solid rgba(0,0,0,.12);
-    display:flex;
-  }
-  .tab{
-    flex:1; border:none;background:none;cursor:pointer;
+    border-top:1px solid rgba(0,0,0,.12); display:flex;}
+  .tab{flex:1; border:none;background:none;cursor:pointer;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    color:var(--gray); font-size:11px; padding-top:8px;
-  }
+    color:var(--gray); font-size:11px; padding-top:8px;}
   .tab svg{width:27px;height:27px;}
   .tab.on{color:var(--blue);}
 
-  /* ---------- add modal ---------- */
+  /* add/edit modal */
   .mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;display:none;align-items:center;justify-content:center;padding:24px;}
   .mask.show{display:flex;}
   .dialog{background:var(--card);border-radius:16px;width:100%;max-width:330px;padding:20px;}
   .dialog h3{margin:2px 0 16px;font-size:19px;text-align:center;}
-  .dialog input{
-    width:100%;border:none;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:16px;
-    margin-bottom:10px;color:var(--ink);-webkit-user-select:text;user-select:text;
-  }
+  .dialog input{width:100%;border:none;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:16px;
+    margin-bottom:10px;color:var(--ink);-webkit-user-select:text;user-select:text;}
   .dialog input:focus{outline:2px solid var(--blue);}
   .dlg-btns{display:flex;gap:10px;margin-top:8px;}
   .dlg-btns button{flex:1;border:none;border-radius:10px;padding:12px;font-size:16px;cursor:pointer;}
   .btn-cancel{background:var(--bg);color:var(--ink);}
   .btn-ok{background:var(--blue);color:#fff;font-weight:600;}
 
-  /* add-todo input */
-  .todo-add{display:flex;align-items:center;gap:10px;padding:0 16px 14px;}
-  .todo-add input{
-    flex:1;border:none;background:var(--card);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--ink);
-    -webkit-user-select:text;user-select:text;
-  }
+  .todo-add{display:flex;align-items:center;gap:10px;padding:0 16px 6px;}
+  .todo-add input{flex:1;border:none;background:var(--card);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--ink);
+    -webkit-user-select:text;user-select:text;}
   .todo-add input:focus{outline:none;}
   .todo-add .addbtn{background:none;border:none;color:var(--blue);font-size:17px;cursor:pointer;padding:8px;}
 </style>
 </head>
 <body>
 
-<!-- ========== COUNTER ========== -->
 <section id="tab-counter" class="panel active">
   <div class="ct-label">カウンター</div>
   <div class="ct-num" id="ctNum">0</div>
@@ -156,34 +122,25 @@
   <div class="ct-when" id="ctWhen">更新日時：—</div>
 </section>
 
-<!-- ========== WEB ========== -->
 <section id="tab-web" class="panel">
   <div class="hdr">
-    <div class="hdr-row">
-      <button class="hbtn" id="webEdit">並び替え</button>
-      <button class="hbtn plus" id="webAdd">＋</button>
-    </div>
+    <div class="hdr-row"><span></span><button class="hbtn plus" id="webAdd">＋</button></div>
     <div class="hdr-title">リンク一覧</div>
   </div>
+  <div class="hint">タップで開く・長押しで並び替え・左スワイプで編集/削除</div>
   <div class="list" id="webList"></div>
 </section>
 
-<!-- ========== TODO ========== -->
 <section id="tab-todo" class="panel">
-  <div class="hdr">
-    <div class="hdr-row">
-      <div class="hdr-title" style="margin:0;">予定</div>
-      <button class="hbtn" id="todoEdit">並び替え</button>
-    </div>
-  </div>
+  <div class="hdr"><div class="hdr-title">予定</div></div>
   <div class="todo-add">
     <input id="todoInput" placeholder="新しい予定を入力" enterkeyhint="done">
     <button class="addbtn" id="todoAddBtn">追加</button>
   </div>
+  <div class="hint">長押しで並び替え・左スワイプで削除</div>
   <div class="list" id="todoList"></div>
 </section>
 
-<!-- ========== TAB BAR ========== -->
 <nav class="tabbar">
   <button class="tab on" data-tab="counter">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h6M7 5v6"/><path d="M14 17h6"/><path d="M5 19l4-4M9 19l-4-4"/></svg>
@@ -199,7 +156,6 @@
   </button>
 </nav>
 
-<!-- ========== ADD LINK DIALOG ========== -->
 <div class="mask" id="linkMask">
   <div class="dialog">
     <h3 id="linkDlgTitle">リンクを追加</h3>
@@ -215,34 +171,29 @@
 <script>
 "use strict";
 const KEY = "gardensTools_v1";
-const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 6.5"/></svg>';
-const MINUS = '<svg viewBox="0 0 14 2"><rect width="14" height="2" rx="1" fill="#fff"/></svg>';
-const GRIP  = '<svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor"><circle cx="7" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="7" cy="11" r="1.6"/><circle cx="15" cy="11" r="1.6"/><circle cx="7" cy="16" r="1.6"/><circle cx="15" cy="16" r="1.6"/></svg>';
 
 /* ---------- state ---------- */
 let state = load();
 function load(){
   try{
     const s = JSON.parse(localStorage.getItem(KEY));
-    if(s && typeof s==="object") return normalize(s);
+    if(s && typeof s==="object"){
+      s.counter = s.counter || {value:0,updated:null};
+      s.links = Array.isArray(s.links)? s.links : [];
+      s.todos = Array.isArray(s.todos)? s.todos.map(t=>({id:t.id, text:t.text})) : [];
+      return s;
+    }
   }catch(e){}
   return {counter:{value:0,updated:null}, links:[], todos:[]};
 }
-function normalize(s){
-  s.counter = s.counter || {value:0,updated:null};
-  s.links = Array.isArray(s.links)? s.links : [];
-  s.todos = Array.isArray(s.todos)? s.todos : [];
-  return s;
-}
-function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
-}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 let _id = Date.now();
 function uid(){ return "i"+(_id++).toString(36); }
 
 /* ---------- tabs ---------- */
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click", ()=>{
+    closeOpenRow();
     const name = t.dataset.tab;
     document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on", x===t));
     document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active", p.id==="tab-"+name));
@@ -264,125 +215,185 @@ function renderCounter(){
 function bump(n){
   const v = state.counter.value + n;
   if(v < 0) return;
-  state.counter.value = v;
-  state.counter.updated = Date.now();
+  state.counter.value = v; state.counter.updated = Date.now();
   save(); renderCounter();
 }
 document.getElementById("ctPlus").addEventListener("click", ()=>bump(1));
 document.getElementById("ctMinus").addEventListener("click", ()=>bump(-1));
 
-/* ---------- reorder (pointer drag from .handle) ---------- */
-function makeSortable(listEl, onReorder){
-  let dragEl=null, grabOffset=0, active=false;
-  listEl.addEventListener("pointerdown", e=>{
-    const handle = e.target.closest(".handle");
-    if(!handle || !listEl.contains(handle)) return;
-    const item = e.target.closest("[data-id]");
-    if(!item) return;
-    e.preventDefault();
-    dragEl=item; active=true;
-    try{ item.setPointerCapture(e.pointerId); }catch(_){}
-    listEl.classList.add("sorting");
-    item.classList.add("dragging");
-    const r=item.getBoundingClientRect();
-    grabOffset = e.clientY - r.top;
-    document.addEventListener("pointermove", onMove, {passive:false});
-    document.addEventListener("pointerup", onUp);
-    document.addEventListener("pointercancel", onUp);
-  });
-  function onMove(e){
-    if(!active) return;
-    e.preventDefault();
-    const y = e.clientY;
-    dragEl.style.transform="none";
-    const dr = dragEl.getBoundingClientRect();
-    const center = (y - grabOffset) + dr.height/2;
-    const sibs = [...listEl.querySelectorAll("[data-id]")].filter(s=>s!==dragEl);
-    let ref=null;
-    for(const s of sibs){ const rr=s.getBoundingClientRect(); if(center < rr.top+rr.height/2){ ref=s; break; } }
-    if(ref) listEl.insertBefore(dragEl, ref); else listEl.appendChild(dragEl);
-    dragEl.style.transform="none";
-    const nr = dragEl.getBoundingClientRect();
-    dragEl.style.transform = `translateY(${y - grabOffset - nr.top}px)`;
-  }
-  function onUp(){
-    if(!active) return;
-    active=false;
-    document.removeEventListener("pointermove", onMove);
-    document.removeEventListener("pointerup", onUp);
-    document.removeEventListener("pointercancel", onUp);
-    dragEl.style.transform="";
-    dragEl.classList.remove("dragging");
-    listEl.classList.remove("sorting");
-    const ids = [...listEl.querySelectorAll("[data-id]")].map(el=>el.dataset.id);
-    dragEl=null;
-    onReorder(ids);
-  }
+/* ---------- gesture engine: tap / long-press drag / horizontal swipe ---------- */
+const SLOP=8, LONGPRESS=340;
+let openRow=null;            // currently swipe-opened row (web)
+function closeOpenRow(){
+  if(openRow){ const c=openRow.querySelector(".cell"); if(c){ c.style.transition="transform .2s"; c.style.transform="translateX(0)"; } openRow=null; }
 }
 function reorderBy(arr, ids){
-  const map = new Map(arr.map(o=>[o.id,o]));
-  return ids.map(id=>map.get(id)).filter(Boolean);
+  const m = new Map(arr.map(o=>[o.id,o]));
+  return ids.map(id=>m.get(id)).filter(Boolean);
+}
+
+/* opts: {onTap(id,row), onReorder(ids), swipe:'reveal'|'delete', actionsWidth, onDelete(id,row)} */
+function attachGestures(listEl, opts){
+  let row, cell, sx, sy, curY, t0, mode, lpTimer, grabOffset, revealW;
+  const getPt = e => e.touches? (e.touches[0]||e.changedTouches[0]) : e;
+
+  function onStart(e){
+    if(mode) return;
+    const target = e.target;
+    if(target.closest(".actions")) return;       // let action buttons handle their own clicks
+    const r = target.closest("[data-id]"); if(!r || !listEl.contains(r)) return;
+    // tap elsewhere closes an opened row first
+    if(openRow && openRow!==r){ closeOpenRow(); }
+    row=r; cell=row.querySelector(".cell");
+    const p=getPt(e); sx=p.clientX; sy=p.clientY; curY=p.clientY; t0=Date.now();
+    mode="pending";
+    revealW = opts.swipe==='reveal' ? (opts.actionsWidth||0) : 0;
+    lpTimer=setTimeout(onLongPress, LONGPRESS);
+    window.addEventListener("touchmove", onMove, {passive:false});
+    window.addEventListener("touchend", onEnd);
+    window.addEventListener("touchcancel", onEnd);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+  }
+
+  function onLongPress(){
+    if(mode!=="pending") return;
+    mode="drag";
+    grabOffset = curY - row.getBoundingClientRect().top;
+    row.classList.add("dragging");
+    if(cell) cell.style.transition="";
+    if(navigator.vibrate) navigator.vibrate(12);
+  }
+
+  function onMove(e){
+    const p=getPt(e); const dx=p.clientX-sx, dy=p.clientY-sy; curY=p.clientY;
+    if(mode==="pending"){
+      if(Math.hypot(dx,dy)>SLOP){
+        clearTimeout(lpTimer);
+        if(Math.abs(dx)>Math.abs(dy)){ mode="swipe"; cell.style.transition=""; }
+        else { cleanup(); }               // vertical → native scroll
+      }
+      return;
+    }
+    if(mode==="swipe"){
+      e.preventDefault();
+      let base = (openRow===row)? -revealW : 0;
+      let tx = base + dx;
+      if(tx>0) tx=0;
+      if(opts.swipe==='reveal' && tx < -revealW-40) tx = -revealW-40;
+      cell.style.transform=`translateX(${tx}px)`;
+      return;
+    }
+    if(mode==="drag"){
+      e.preventDefault();
+      const y=curY;
+      row.style.transform="none";
+      const dr=row.getBoundingClientRect();
+      const center=(y-grabOffset)+dr.height/2;
+      const sibs=[...listEl.querySelectorAll("[data-id]")].filter(s=>s!==row);
+      let ref=null;
+      for(const s of sibs){ const rr=s.getBoundingClientRect(); if(center<rr.top+rr.height/2){ ref=s; break; } }
+      if(ref) listEl.insertBefore(row, ref); else listEl.appendChild(row);
+      row.style.transform="none";
+      const nr=row.getBoundingClientRect();
+      row.style.transform=`translateY(${y-grabOffset-nr.top}px)`;
+    }
+  }
+
+  function onEnd(e){
+    clearTimeout(lpTimer);
+    if(mode==="pending"){
+      const quick = Date.now()-t0 < LONGPRESS;
+      if(openRow){ closeOpenRow(); }
+      else if(quick && opts.onTap){ opts.onTap(row.dataset.id, row); }
+    } else if(mode==="swipe"){
+      const p=getPt(e); const dx=p.clientX-sx;
+      if(opts.swipe==='delete'){
+        const w=row.getBoundingClientRect().width;
+        if(dx < -Math.min(w*0.4,110)){
+          cell.style.transition="transform .18s"; cell.style.transform=`translateX(-110%)`;
+          const id=row.dataset.id; setTimeout(()=>opts.onDelete(id,row),170);
+        } else { snapBack(); }
+      } else { // reveal
+        const base=(openRow===row)?-revealW:0; const tx=base+dx;
+        if(tx < -revealW/2){ cell.style.transition="transform .2s"; cell.style.transform=`translateX(${-revealW}px)`; openRow=row; }
+        else { snapBack(); if(openRow===row) openRow=null; }
+      }
+    } else if(mode==="drag"){
+      row.style.transform=""; row.classList.remove("dragging");
+      const ids=[...listEl.querySelectorAll("[data-id]")].map(el=>el.dataset.id);
+      opts.onReorder(ids);
+    }
+    cleanup();
+  }
+  function snapBack(){ cell.style.transition="transform .2s"; cell.style.transform="translateX(0)"; }
+  function cleanup(){
+    mode=null;
+    window.removeEventListener("touchmove", onMove);
+    window.removeEventListener("touchend", onEnd);
+    window.removeEventListener("touchcancel", onEnd);
+    window.removeEventListener("mousemove", onMove);
+    window.removeEventListener("mouseup", onEnd);
+  }
+
+  listEl.addEventListener("touchstart", onStart, {passive:true});
+  listEl.addEventListener("mousedown", onStart);
 }
 
 /* ---------- web (links) ---------- */
 const webList = document.getElementById("webList");
-let webEditing = false;
-function normalizeUrl(u){
-  u = u.trim();
-  if(!u) return "";
-  if(!/^https?:\/\//i.test(u)) u = "https://" + u;
-  return u;
-}
+function normalizeUrl(u){ u=u.trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u; return u; }
 function renderWeb(){
-  webList.innerHTML = "";
+  webList.innerHTML=""; openRow=null;
   if(state.links.length===0){
-    const e=document.createElement("div"); e.className="empty";
-    e.textContent = "「＋」でリンクを追加";
-    webList.appendChild(e);
-    document.getElementById("webEdit").style.visibility = "hidden";
-    return;
+    const e=document.createElement("div"); e.className="empty"; e.textContent="「＋」でリンクを追加"; webList.appendChild(e);
+    document.querySelector('#tab-web .hint').style.visibility="hidden"; return;
   }
-  document.getElementById("webEdit").style.visibility = "visible";
+  document.querySelector('#tab-web .hint').style.visibility="visible";
   state.links.forEach(l=>{
     const row=document.createElement("div"); row.className="row"; row.dataset.id=l.id;
-    if(webEditing){
-      const del=document.createElement("button"); del.className="del"; del.innerHTML=MINUS;
-      del.addEventListener("click",ev=>{ev.stopPropagation(); state.links=state.links.filter(x=>x.id!==l.id); save(); renderWeb();});
-      row.appendChild(del);
-    }
+    const acts=document.createElement("div"); acts.className="actions";
+    const ed=document.createElement("button"); ed.className="act edit"; ed.textContent="編集";
+    ed.addEventListener("click",ev=>{ev.stopPropagation(); closeOpenRow(); openLinkDlg(l.id);});
+    const de=document.createElement("button"); de.className="act del"; de.textContent="削除";
+    de.addEventListener("click",ev=>{ev.stopPropagation(); state.links=state.links.filter(x=>x.id!==l.id); save(); renderWeb();});
+    acts.appendChild(ed); acts.appendChild(de);
+    const cell=document.createElement("div"); cell.className="cell";
     const name=document.createElement("div"); name.className="link-name"; name.textContent=l.name;
-    row.appendChild(name);
-    if(webEditing){
-      const h=document.createElement("div"); h.className="handle"; h.innerHTML=GRIP;
-      row.appendChild(h);
-    }else{
-      const c=document.createElement("div"); c.className="chev"; c.textContent="›";
-      row.appendChild(c);
-      row.addEventListener("click", ()=>{ if(l.url) window.open(l.url,"_blank"); });
-    }
+    const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
+    cell.appendChild(name); cell.appendChild(chev);
+    row.appendChild(acts); row.appendChild(cell);
     webList.appendChild(row);
   });
 }
-document.getElementById("webEdit").addEventListener("click", ()=>{
-  webEditing=!webEditing;
-  document.getElementById("webEdit").textContent = webEditing? "完了":"並び替え";
-  renderWeb();
+attachGestures(webList, {
+  swipe:'reveal', actionsWidth:152,
+  onTap:(id)=>{ const l=state.links.find(x=>x.id===id); if(l&&l.url) window.open(l.url,"_blank"); },
+  onReorder:(ids)=>{ state.links=reorderBy(state.links,ids); save(); }
 });
-makeSortable(webList, ids=>{ state.links = reorderBy(state.links, ids); save(); });
 
-/* add-link dialog */
+/* add / edit dialog */
 const linkMask=document.getElementById("linkMask");
 const linkName=document.getElementById("linkName");
 const linkUrl=document.getElementById("linkUrl");
-function openLinkDlg(){ linkName.value=""; linkUrl.value=""; linkMask.classList.add("show"); setTimeout(()=>linkName.focus(),50); }
-function closeLinkDlg(){ linkMask.classList.remove("show"); }
-document.getElementById("webAdd").addEventListener("click", openLinkDlg);
+let editId=null;
+function openLinkDlg(id){
+  editId=id||null;
+  const l = id? state.links.find(x=>x.id===id) : null;
+  document.getElementById("linkDlgTitle").textContent = l? "リンクを編集" : "リンクを追加";
+  linkName.value = l? l.name : "";
+  linkUrl.value = l? (l.url||"") : "";
+  linkMask.classList.add("show"); setTimeout(()=>linkName.focus(),50);
+}
+function closeLinkDlg(){ linkMask.classList.remove("show"); editId=null; }
+document.getElementById("webAdd").addEventListener("click", ()=>{ closeOpenRow(); openLinkDlg(); });
 document.getElementById("linkCancel").addEventListener("click", closeLinkDlg);
 linkMask.addEventListener("click", e=>{ if(e.target===linkMask) closeLinkDlg(); });
 document.getElementById("linkOk").addEventListener("click", ()=>{
   const n=linkName.value.trim(); const u=normalizeUrl(linkUrl.value);
   if(!n && !u) return;
-  state.links.push({id:uid(), name:n||u, url:u});
+  if(editId){ const l=state.links.find(x=>x.id===editId); if(l){ l.name=n||u; l.url=u; } }
+  else { state.links.push({id:uid(), name:n||u, url:u}); }
   save(); renderWeb(); closeLinkDlg();
 });
 linkName.addEventListener("keydown", e=>{ if(e.key==="Enter") linkUrl.focus(); });
@@ -391,55 +402,39 @@ linkUrl.addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElement
 /* ---------- todo ---------- */
 const todoList=document.getElementById("todoList");
 const todoInput=document.getElementById("todoInput");
-let todoEditing=false;
 function renderTodo(){
   todoList.innerHTML="";
   if(state.todos.length===0){
-    const e=document.createElement("div"); e.className="empty"; e.textContent="予定はありません";
-    todoList.appendChild(e);
-    document.getElementById("todoEdit").style.visibility="hidden";
-    return;
+    const e=document.createElement("div"); e.className="empty"; e.textContent="予定はありません"; todoList.appendChild(e);
+    document.querySelector('#tab-todo .hint').style.visibility="hidden"; return;
   }
-  document.getElementById("todoEdit").style.visibility="visible";
+  document.querySelector('#tab-todo .hint').style.visibility="visible";
   state.todos.forEach(t=>{
     const row=document.createElement("div"); row.className="row"; row.dataset.id=t.id;
-    if(todoEditing){
-      const del=document.createElement("button"); del.className="del"; del.innerHTML=MINUS;
-      del.addEventListener("click",ev=>{ev.stopPropagation(); state.todos=state.todos.filter(x=>x.id!==t.id); save(); renderTodo();});
-      row.appendChild(del);
-    }else{
-      const c=document.createElement("button"); c.className="circle"+(t.done?" on":""); c.innerHTML=CHECK;
-      c.addEventListener("click",()=>{ t.done=!t.done; save(); renderTodo(); });
-      row.appendChild(c);
-    }
-    const tx=document.createElement("div"); tx.className="todo-text"+(t.done?" done":""); tx.textContent=t.text;
-    row.appendChild(tx);
-    if(todoEditing){
-      const h=document.createElement("div"); h.className="handle"; h.innerHTML=GRIP;
-      row.appendChild(h);
-    }
+    const bg=document.createElement("div"); bg.className="delbg"; bg.textContent="削除";
+    const cell=document.createElement("div"); cell.className="cell";
+    const tx=document.createElement("div"); tx.className="todo-text"; tx.textContent=t.text;
+    cell.appendChild(tx);
+    row.appendChild(bg); row.appendChild(cell);
     todoList.appendChild(row);
   });
 }
 function addTodo(){
-  const v=todoInput.value.trim();
-  if(!v) return;
-  state.todos.push({id:uid(), text:v, done:false});
+  const v=todoInput.value.trim(); if(!v) return;
+  state.todos.push({id:uid(), text:v});
   todoInput.value=""; save(); renderTodo();
 }
 document.getElementById("todoAddBtn").addEventListener("click", addTodo);
-todoInput.addEventListener("keydown", e=>{ if(e.key==="Enter"){ addTodo(); } });
-document.getElementById("todoEdit").addEventListener("click", ()=>{
-  todoEditing=!todoEditing;
-  document.getElementById("todoEdit").textContent = todoEditing? "完了":"並び替え";
-  renderTodo();
+todoInput.addEventListener("keydown", e=>{ if(e.key==="Enter") addTodo(); });
+attachGestures(todoList, {
+  swipe:'delete',
+  onReorder:(ids)=>{ state.todos=reorderBy(state.todos,ids); save(); },
+  onDelete:(id)=>{ state.todos=state.todos.filter(x=>x.id!==id); save(); renderTodo(); }
 });
-makeSortable(todoList, ids=>{ state.todos = reorderBy(state.todos, ids); save(); });
 
-/* prevent double-tap zoom / pinch */
 document.addEventListener("gesturestart", e=>e.preventDefault());
 
-/* ---------- init ---------- */
+/* init */
 renderCounter(); renderWeb(); renderTodo();
 </script>
 </body>
