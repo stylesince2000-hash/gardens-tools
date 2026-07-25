@@ -49,9 +49,9 @@
   .hint{color:var(--gray);font-size:12.5px;padding:0 18px 8px;}
 
   /* list */
-  .list{background:var(--card); border-radius:12px; margin:0 16px; overflow:hidden;}
+  .list{position:relative; background:var(--card); border-radius:12px; margin:0 16px; overflow:hidden;}
   .row{position:relative; background:var(--card); overflow:hidden;}
-  .row.dragging{z-index:5; box-shadow:0 10px 26px rgba(0,0,0,.18); border-radius:10px; overflow:visible;}
+  .row.dragging{z-index:6; box-shadow:0 10px 26px rgba(0,0,0,.18); border-radius:10px; overflow:visible;}
   .cell{
     position:relative; z-index:1; background:var(--card);
     display:flex; align-items:center; gap:12px; padding:15px 16px;
@@ -61,21 +61,26 @@
     content:""; position:absolute; left:0; right:-16px; bottom:0; height:1px; background:var(--sep);
   }
   .row.dragging .cell::after{display:none;}
+  .row.merge-target .cell{ background:#e9f1ff; box-shadow:inset 0 0 0 2px var(--blue); border-radius:10px; }
 
+  .fic{flex:0 0 auto; width:26px; height:26px; display:flex; align-items:center; justify-content:center;}
   .link-name{color:var(--brown); font-size:18px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .folder-name{color:var(--ink); font-size:18px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .count{color:var(--gray); font-size:15px; margin-left:2px;}
   .chev{color:#c7c7cc; font-size:20px;}
   .todo-text{flex:1; font-size:18px; min-width:0; word-break:break-word;}
 
-  /* swipe actions (web) */
+  .drop-line{position:absolute; left:16px; right:16px; height:2px; background:var(--blue); border-radius:2px; z-index:7; pointer-events:none; margin-top:-1px;}
+
+  /* swipe actions */
   .actions{position:absolute; top:0; right:0; bottom:0; display:flex; z-index:0;}
   .act{border:none; color:#fff; font-size:16px; width:76px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .act.out{background:#8e8e93;}
   .act.edit{background:#5e5ce6;}
   .act.del{background:var(--red);}
 
-  /* swipe-to-delete bg (todo) */
   .delbg{position:absolute; inset:0; background:var(--red); display:flex; align-items:center; justify-content:flex-end;
     padding-right:24px; color:#fff; z-index:0; font-size:16px;}
-
   .empty{color:var(--gray);text-align:center;font-size:16px;padding:40px 20px;}
 
   /* tab bar */
@@ -90,8 +95,17 @@
   .tab svg{width:27px;height:27px;}
   .tab.on{color:var(--blue);}
 
-  /* add/edit modal */
-  .mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;display:none;align-items:center;justify-content:center;padding:24px;}
+  /* folder view */
+  .folderview{position:fixed; inset:0; z-index:30; background:var(--bg); display:none; flex-direction:column;
+    padding-top:env(safe-area-inset-top); padding-bottom:calc(var(--tabbar) + env(safe-area-inset-bottom));}
+  .folderview.show{display:flex;}
+  .fv-bar{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 14px 2px;}
+  .fv-title{font-size:17px; font-weight:600; flex:1; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .fv-back{color:var(--blue); font-size:17px; background:none; border:none; cursor:pointer; white-space:nowrap;}
+  .fv-list-wrap{overflow-y:auto; -webkit-overflow-scrolling:touch; padding-top:4px;}
+
+  /* modal */
+  .mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60;display:none;align-items:center;justify-content:center;padding:24px;}
   .mask.show{display:flex;}
   .dialog{background:var(--card);border-radius:16px;width:100%;max-width:330px;padding:20px;}
   .dialog h3{margin:2px 0 16px;font-size:19px;text-align:center;}
@@ -127,7 +141,7 @@
     <div class="hdr-row"><span></span><button class="hbtn plus" id="webAdd">＋</button></div>
     <div class="hdr-title">リンク一覧</div>
   </div>
-  <div class="hint">タップで開く・長押しで並び替え・左スワイプで編集/削除</div>
+  <div class="hint">タップで開く・長押しで移動（中央に重ねてフォルダ）・左スワイプで編集/削除</div>
   <div class="list" id="webList"></div>
 </section>
 
@@ -156,6 +170,16 @@
   </button>
 </nav>
 
+<section id="folderView" class="folderview">
+  <div class="fv-bar">
+    <button class="fv-back" id="fvBack">‹ 一覧</button>
+    <div class="fv-title" id="fvTitle">フォルダ</div>
+    <button class="hbtn plus" id="fvAdd">＋</button>
+  </div>
+  <div class="hint" style="text-align:center;">名前をタップで変更・長押しで並び替え・左スワイプで出す/編集/削除</div>
+  <div class="fv-list-wrap"><div class="list" id="folderList"></div></div>
+</section>
+
 <div class="mask" id="linkMask">
   <div class="dialog">
     <h3 id="linkDlgTitle">リンクを追加</h3>
@@ -175,6 +199,17 @@
     <div class="dlg-btns">
       <button class="btn-cancel" id="todoCancel">キャンセル</button>
       <button class="btn-ok" id="todoOk">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="renameMask">
+  <div class="dialog">
+    <h3>フォルダ名を変更</h3>
+    <input id="renameInput" placeholder="フォルダ名" enterkeyhint="done">
+    <div class="dlg-btns">
+      <button class="btn-cancel" id="renameCancel">キャンセル</button>
+      <button class="btn-ok" id="renameOk">保存</button>
     </div>
   </div>
 </div>
@@ -201,10 +236,19 @@ function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e
 let _id = Date.now();
 function uid(){ return "i"+(_id++).toString(36); }
 
+const isFolder = it => it && Array.isArray(it.items);
+const isLink   = it => it && !Array.isArray(it.items);
+function topById(id){ return state.links.find(x=>x.id===id); }
+function findLinkAnywhere(id){
+  let l = state.links.find(x=>isLink(x) && x.id===id); if(l) return l;
+  for(const f of state.links){ if(isFolder(f)){ const g=f.items.find(x=>x.id===id); if(g) return g; } }
+  return null;
+}
+
 /* ---------- tabs ---------- */
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click", ()=>{
-    closeOpenRow();
+    closeOpenRow(); closeFolder();
     const name = t.dataset.tab;
     document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on", x===t));
     document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active", p.id==="tab-"+name));
@@ -232,9 +276,9 @@ function bump(n){
 document.getElementById("ctPlus").addEventListener("click", ()=>bump(1));
 document.getElementById("ctMinus").addEventListener("click", ()=>bump(-1));
 
-/* ---------- gesture engine: tap / long-press drag / horizontal swipe ---------- */
+/* ---------- gesture engine ---------- */
 const SLOP=8, LONGPRESS=340;
-let openRow=null;            // currently swipe-opened row (web)
+let openRow=null;
 function closeOpenRow(){
   if(openRow){ const c=openRow.querySelector(".cell"); if(c){ c.style.transition="transform .2s"; c.style.transform="translateX(0)"; } openRow=null; }
 }
@@ -243,21 +287,25 @@ function reorderBy(arr, ids){
   return ids.map(id=>m.get(id)).filter(Boolean);
 }
 
-/* opts: {onTap(id,row), onReorder(ids), swipe:'reveal'|'delete', actionsWidth, onDelete(id,row)} */
+/*
+ opts:
+  swipe:'reveal'|'delete', actionsWidth, onTap(id), onDelete(id),
+  onReorder(ids)                       // non-folder lists (live shuffle)
+  folders:true, canMerge(a,b), onDrop({draggedId,mergeId,index})  // web top list
+*/
 function attachGestures(listEl, opts){
   let row, cell, sx, sy, curY, t0, mode, lpTimer, grabOffset, revealW;
+  // folders-mode drag vars
+  let slots, draggedTop, mergeEl, mergeId, dropIndex, dropLine;
   const getPt = e => e.touches? (e.touches[0]||e.changedTouches[0]) : e;
 
   function onStart(e){
     if(mode) return;
-    const target = e.target;
-    if(target.closest(".actions")) return;       // let action buttons handle their own clicks
-    const r = target.closest("[data-id]"); if(!r || !listEl.contains(r)) return;
-    // tap elsewhere closes an opened row first
-    if(openRow && openRow!==r){ closeOpenRow(); }
+    if(e.target.closest(".actions")) return;
+    const r = e.target.closest("[data-id]"); if(!r || !listEl.contains(r)) return;
+    if(openRow && openRow!==r) closeOpenRow();
     row=r; cell=row.querySelector(".cell");
-    const p=getPt(e); sx=p.clientX; sy=p.clientY; curY=p.clientY; t0=Date.now();
-    mode="pending";
+    const p=getPt(e); sx=p.clientX; sy=p.clientY; curY=p.clientY; t0=Date.now(); mode="pending";
     revealW = opts.swipe==='reveal' ? (opts.actionsWidth||0) : 0;
     lpTimer=setTimeout(onLongPress, LONGPRESS);
     window.addEventListener("touchmove", onMove, {passive:false});
@@ -270,10 +318,17 @@ function attachGestures(listEl, opts){
   function onLongPress(){
     if(mode!=="pending") return;
     mode="drag";
-    grabOffset = curY - row.getBoundingClientRect().top;
     row.classList.add("dragging");
     if(cell) cell.style.transition="";
     if(navigator.vibrate) navigator.vibrate(12);
+    if(opts.folders){
+      slots=[...listEl.querySelectorAll(".row")].map(r=>({el:r,id:r.dataset.id,rect:r.getBoundingClientRect()}));
+      const d=slots.find(s=>s.id===row.dataset.id); draggedTop=d.rect.top; grabOffset=curY-draggedTop;
+      mergeEl=null; mergeId=null; dropIndex=null;
+      dropLine=document.createElement("div"); dropLine.className="drop-line"; dropLine.style.display="none"; listEl.appendChild(dropLine);
+    } else {
+      grabOffset = curY - row.getBoundingClientRect().top;
+    }
   }
 
   function onMove(e){
@@ -282,32 +337,60 @@ function attachGestures(listEl, opts){
       if(Math.hypot(dx,dy)>SLOP){
         clearTimeout(lpTimer);
         if(Math.abs(dx)>Math.abs(dy)){ mode="swipe"; cell.style.transition=""; }
-        else { cleanup(); }               // vertical → native scroll
+        else cleanup();
       }
       return;
     }
     if(mode==="swipe"){
       e.preventDefault();
-      let base = (openRow===row)? -revealW : 0;
-      let tx = base + dx;
-      if(tx>0) tx=0;
-      if(opts.swipe==='reveal' && tx < -revealW-40) tx = -revealW-40;
-      cell.style.transform=`translateX(${tx}px)`;
-      return;
+      let base=(openRow===row)?-revealW:0, tx=base+dx; if(tx>0)tx=0;
+      if(opts.swipe==='reveal' && tx < -revealW-40) tx=-revealW-40;
+      cell.style.transform=`translateX(${tx}px)`; return;
     }
     if(mode==="drag"){
       e.preventDefault();
-      const y=curY;
-      row.style.transform="none";
-      const dr=row.getBoundingClientRect();
-      const center=(y-grabOffset)+dr.height/2;
-      const sibs=[...listEl.querySelectorAll("[data-id]")].filter(s=>s!==row);
-      let ref=null;
-      for(const s of sibs){ const rr=s.getBoundingClientRect(); if(center<rr.top+rr.height/2){ ref=s; break; } }
-      if(ref) listEl.insertBefore(row, ref); else listEl.appendChild(row);
-      row.style.transform="none";
-      const nr=row.getBoundingClientRect();
-      row.style.transform=`translateY(${y-grabOffset-nr.top}px)`;
+      if(opts.folders) dragFolders(); else dragShuffle();
+    }
+  }
+
+  function dragShuffle(){
+    const y=curY;
+    row.style.transform="none";
+    const dr=row.getBoundingClientRect();
+    const center=(y-grabOffset)+dr.height/2;
+    const sibs=[...listEl.querySelectorAll("[data-id]")].filter(s=>s!==row);
+    let ref=null;
+    for(const s of sibs){ const rr=s.getBoundingClientRect(); if(center<rr.top+rr.height/2){ ref=s; break; } }
+    if(ref) listEl.insertBefore(row, ref); else listEl.appendChild(row);
+    row.style.transform="none";
+    const nr=row.getBoundingClientRect();
+    row.style.transform=`translateY(${y-grabOffset-nr.top}px)`;
+  }
+
+  function dragFolders(){
+    const y=curY;
+    row.style.transform=`translateY(${y-grabOffset-draggedTop}px)`;
+    if(mergeEl){ mergeEl.classList.remove("merge-target"); mergeEl=null; mergeId=null; }
+    const others=slots.filter(s=>s.id!==row.dataset.id);
+    let hov=null;
+    for(const s of others){ if(y>=s.rect.top && y<=s.rect.bottom){ hov=s; break; } }
+    let merge=false;
+    if(hov){
+      const rel=(y-hov.rect.top)/hov.rect.height;
+      if(rel>=0.3 && rel<=0.7 && opts.canMerge(row.dataset.id, hov.id)){
+        mergeEl=hov.el; mergeId=hov.id; mergeEl.classList.add("merge-target");
+        merge=true; dropIndex=null; dropLine.style.display="none";
+      }
+    }
+    if(!merge){
+      let idx=0; for(const s of others){ if(y > (s.rect.top+s.rect.bottom)/2) idx++; }
+      dropIndex=idx;
+      if(others.length===0){ dropLine.style.display="none"; }
+      else {
+        const listTop=listEl.getBoundingClientRect().top;
+        const t = (idx===0)? others[0].rect.top : others[idx-1].rect.bottom;
+        dropLine.style.top=(t-listTop)+"px"; dropLine.style.display="block";
+      }
     }
   }
 
@@ -315,25 +398,30 @@ function attachGestures(listEl, opts){
     clearTimeout(lpTimer);
     if(mode==="pending"){
       const quick = Date.now()-t0 < LONGPRESS;
-      if(openRow){ closeOpenRow(); }
-      else if(quick && opts.onTap){ opts.onTap(row.dataset.id, row); }
+      if(openRow) closeOpenRow();
+      else if(quick && opts.onTap) opts.onTap(row.dataset.id);
     } else if(mode==="swipe"){
       const p=getPt(e); const dx=p.clientX-sx;
       if(opts.swipe==='delete'){
         const w=row.getBoundingClientRect().width;
         if(dx < -Math.min(w*0.4,110)){
-          cell.style.transition="transform .18s"; cell.style.transform=`translateX(-110%)`;
-          const id=row.dataset.id; setTimeout(()=>opts.onDelete(id,row),170);
-        } else { snapBack(); }
-      } else { // reveal
-        const base=(openRow===row)?-revealW:0; const tx=base+dx;
+          cell.style.transition="transform .18s"; cell.style.transform="translateX(-110%)";
+          const id=row.dataset.id; setTimeout(()=>opts.onDelete(id),170);
+        } else snapBack();
+      } else {
+        const base=(openRow===row)?-revealW:0, tx=base+dx;
         if(tx < -revealW/2){ cell.style.transition="transform .2s"; cell.style.transform=`translateX(${-revealW}px)`; openRow=row; }
         else { snapBack(); if(openRow===row) openRow=null; }
       }
     } else if(mode==="drag"){
-      row.style.transform=""; row.classList.remove("dragging");
-      const ids=[...listEl.querySelectorAll("[data-id]")].map(el=>el.dataset.id);
-      opts.onReorder(ids);
+      row.classList.remove("dragging"); row.style.transform="";
+      if(opts.folders){
+        if(dropLine){ dropLine.remove(); dropLine=null; }
+        if(mergeEl){ mergeEl.classList.remove("merge-target"); }
+        opts.onDrop({draggedId:row.dataset.id, mergeId:mergeId, index:dropIndex});
+      } else {
+        opts.onReorder([...listEl.querySelectorAll("[data-id]")].map(el=>el.dataset.id));
+      }
     }
     cleanup();
   }
@@ -346,14 +434,47 @@ function attachGestures(listEl, opts){
     window.removeEventListener("mousemove", onMove);
     window.removeEventListener("mouseup", onEnd);
   }
-
   listEl.addEventListener("touchstart", onStart, {passive:true});
   listEl.addEventListener("mousedown", onStart);
 }
 
-/* ---------- web (links) ---------- */
+/* ---------- web (links + folders) ---------- */
 const webList = document.getElementById("webList");
+const FOLDER_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="#e0b877"><path d="M4 5h5l2 2h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>';
 function normalizeUrl(u){ u=u.trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u; return u; }
+
+function makeLinkRow(l){
+  const row=document.createElement("div"); row.className="row"; row.dataset.id=l.id;
+  const acts=document.createElement("div"); acts.className="actions";
+  const ed=document.createElement("button"); ed.className="act edit"; ed.textContent="編集";
+  ed.addEventListener("click",ev=>{ev.stopPropagation(); closeOpenRow(); openLinkDlg(l.id);});
+  const de=document.createElement("button"); de.className="act del"; de.textContent="削除";
+  de.addEventListener("click",ev=>{ev.stopPropagation(); deleteLinkTop(l.id);});
+  acts.appendChild(ed); acts.appendChild(de);
+  const cell=document.createElement("div"); cell.className="cell";
+  const name=document.createElement("div"); name.className="link-name"; name.textContent=l.name;
+  const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
+  cell.appendChild(name); cell.appendChild(chev);
+  row.appendChild(acts); row.appendChild(cell);
+  return row;
+}
+function makeFolderRow(f){
+  const row=document.createElement("div"); row.className="row"; row.dataset.id=f.id;
+  const acts=document.createElement("div"); acts.className="actions";
+  const rn=document.createElement("button"); rn.className="act edit"; rn.textContent="名前";
+  rn.addEventListener("click",ev=>{ev.stopPropagation(); closeOpenRow(); openRenameDlg(f.id);});
+  const de=document.createElement("button"); de.className="act del"; de.textContent="削除";
+  de.addEventListener("click",ev=>{ev.stopPropagation(); deleteFolder(f.id);});
+  acts.appendChild(rn); acts.appendChild(de);
+  const cell=document.createElement("div"); cell.className="cell";
+  const ic=document.createElement("div"); ic.className="fic"; ic.innerHTML=FOLDER_SVG;
+  const name=document.createElement("div"); name.className="folder-name"; name.textContent=f.name;
+  const cnt=document.createElement("div"); cnt.className="count"; cnt.textContent="("+f.items.length+")";
+  const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
+  cell.appendChild(ic); cell.appendChild(name); cell.appendChild(cnt); cell.appendChild(chev);
+  row.appendChild(acts); row.appendChild(cell);
+  return row;
+}
 function renderWeb(){
   webList.innerHTML=""; openRow=null;
   if(state.links.length===0){
@@ -361,54 +482,152 @@ function renderWeb(){
     document.querySelector('#tab-web .hint').style.visibility="hidden"; return;
   }
   document.querySelector('#tab-web .hint').style.visibility="visible";
-  state.links.forEach(l=>{
+  state.links.forEach(it=>{ webList.appendChild(isFolder(it)? makeFolderRow(it) : makeLinkRow(it)); });
+}
+function deleteLinkTop(id){ state.links=state.links.filter(x=>x.id!==id); save(); renderWeb(); }
+function deleteFolder(id){
+  const f=topById(id); if(!f) return;
+  const msg = f.items.length? `フォルダ「${f.name}」と中の ${f.items.length} 件を削除しますか？` : `フォルダ「${f.name}」を削除しますか？`;
+  if(!confirm(msg)) return;
+  state.links=state.links.filter(x=>x.id!==id); save(); renderWeb();
+}
+function webTapItem(id){
+  const it=topById(id);
+  if(isFolder(it)) openFolder(id);
+  else if(it && it.url) window.open(it.url,"_blank");
+}
+attachGestures(webList, {
+  swipe:'reveal', actionsWidth:152, folders:true,
+  onTap:(id)=>webTapItem(id),
+  canMerge:(aId,bId)=>{ const a=topById(aId), b=topById(bId); return isLink(a) && (isLink(b)||isFolder(b)); },
+  onDrop:({draggedId,mergeId,index})=>{
+    const dIdx=state.links.findIndex(x=>x.id===draggedId); if(dIdx<0) return;
+    const dragged=state.links[dIdx];
+    if(mergeId){
+      state.links.splice(dIdx,1);
+      const tIdx=state.links.findIndex(x=>x.id===mergeId); if(tIdx<0){ state.links.splice(dIdx,0,dragged); return; }
+      const target=state.links[tIdx];
+      if(isFolder(target)) target.items.push(dragged);
+      else state.links.splice(tIdx,1,{id:uid(), name:"フォルダ", items:[target, dragged]});
+      save(); renderWeb(); return;
+    }
+    const others=state.links.filter(x=>x.id!==draggedId);
+    const i=Math.max(0, Math.min(index==null?others.length:index, others.length));
+    others.splice(i,0,dragged);
+    state.links=others; save(); renderWeb();
+  }
+});
+
+/* ---------- folder view ---------- */
+const folderView=document.getElementById("folderView");
+const folderList=document.getElementById("folderList");
+const fvTitle=document.getElementById("fvTitle");
+let openFolderId=null;
+function currentFolder(){ return openFolderId? topById(openFolderId) : null; }
+function openFolder(id){
+  const f=topById(id); if(!isFolder(f)) return;
+  openFolderId=id; fvTitle.textContent=f.name; renderFolder(); folderView.classList.add("show");
+}
+function closeFolder(){ folderView.classList.remove("show"); openFolderId=null; }
+function renderFolder(){
+  const f=currentFolder(); if(!f){ closeFolder(); return; }
+  fvTitle.textContent=f.name;
+  folderList.innerHTML=""; openRow=null;
+  if(f.items.length===0){ const e=document.createElement("div"); e.className="empty"; e.textContent="空のフォルダ"; folderList.appendChild(e); return; }
+  f.items.forEach(l=>{
     const row=document.createElement("div"); row.className="row"; row.dataset.id=l.id;
     const acts=document.createElement("div"); acts.className="actions";
+    const out=document.createElement("button"); out.className="act out"; out.textContent="出す";
+    out.addEventListener("click",ev=>{ev.stopPropagation(); moveOut(l.id);});
     const ed=document.createElement("button"); ed.className="act edit"; ed.textContent="編集";
     ed.addEventListener("click",ev=>{ev.stopPropagation(); closeOpenRow(); openLinkDlg(l.id);});
     const de=document.createElement("button"); de.className="act del"; de.textContent="削除";
-    de.addEventListener("click",ev=>{ev.stopPropagation(); state.links=state.links.filter(x=>x.id!==l.id); save(); renderWeb();});
-    acts.appendChild(ed); acts.appendChild(de);
+    de.addEventListener("click",ev=>{ev.stopPropagation(); deleteInFolder(l.id);});
+    acts.appendChild(out); acts.appendChild(ed); acts.appendChild(de);
     const cell=document.createElement("div"); cell.className="cell";
     const name=document.createElement("div"); name.className="link-name"; name.textContent=l.name;
     const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
     cell.appendChild(name); cell.appendChild(chev);
     row.appendChild(acts); row.appendChild(cell);
-    webList.appendChild(row);
+    folderList.appendChild(row);
   });
 }
-attachGestures(webList, {
-  swipe:'reveal', actionsWidth:152,
-  onTap:(id)=>{ const l=state.links.find(x=>x.id===id); if(l&&l.url) window.open(l.url,"_blank"); },
-  onReorder:(ids)=>{ state.links=reorderBy(state.links,ids); save(); }
+/* dissolve folder down to a plain link when 1 item, or remove when empty */
+function afterFolderChange(){
+  const f=currentFolder(); if(!f){ save(); renderWeb(); return; }
+  if(f.items.length<=1){
+    const idx=state.links.indexOf(f);
+    if(f.items.length===1) state.links.splice(idx,1,f.items[0]);
+    else state.links.splice(idx,1);
+    save(); closeFolder(); renderWeb();
+  } else { save(); renderFolder(); renderWeb(); }
+}
+function moveOut(id){
+  const f=currentFolder(); if(!f) return;
+  const i=f.items.findIndex(x=>x.id===id); if(i<0) return;
+  const [l]=f.items.splice(i,1); state.links.push(l);
+  afterFolderChange();
+}
+function deleteInFolder(id){
+  const f=currentFolder(); if(!f) return;
+  f.items=f.items.filter(x=>x.id!==id);
+  afterFolderChange();
+}
+attachGestures(folderList, {
+  swipe:'reveal', actionsWidth:228,
+  onTap:(id)=>{ const l=findLinkAnywhere(id); if(l&&l.url) window.open(l.url,"_blank"); },
+  onReorder:(ids)=>{ const f=currentFolder(); if(f){ f.items=reorderBy(f.items,ids); save(); } }
 });
+document.getElementById("fvBack").addEventListener("click", closeFolder);
+document.getElementById("fvAdd").addEventListener("click", ()=>{ closeOpenRow(); openLinkDlg(null, openFolderId); });
+fvTitle.addEventListener("click", ()=>{ if(openFolderId) openRenameDlg(openFolderId); });
 
-/* add / edit dialog */
+/* ---------- add / edit link dialog ---------- */
 const linkMask=document.getElementById("linkMask");
 const linkName=document.getElementById("linkName");
 const linkUrl=document.getElementById("linkUrl");
-let editId=null;
-function openLinkDlg(id){
-  editId=id||null;
-  const l = id? state.links.find(x=>x.id===id) : null;
+let editId=null, addFolderId=null;
+function openLinkDlg(id, folderId){
+  editId=id||null; addFolderId=folderId||null;
+  const l = id? findLinkAnywhere(id) : null;
   document.getElementById("linkDlgTitle").textContent = l? "リンクを編集" : "リンクを追加";
   linkName.value = l? l.name : "";
   linkUrl.value = l? (l.url||"") : "";
   linkMask.classList.add("show"); setTimeout(()=>linkName.focus(),50);
 }
-function closeLinkDlg(){ linkMask.classList.remove("show"); editId=null; }
+function closeLinkDlg(){ linkMask.classList.remove("show"); editId=null; addFolderId=null; }
 document.getElementById("webAdd").addEventListener("click", ()=>{ closeOpenRow(); openLinkDlg(); });
 document.getElementById("linkCancel").addEventListener("click", closeLinkDlg);
 linkMask.addEventListener("click", e=>{ if(e.target===linkMask) closeLinkDlg(); });
 document.getElementById("linkOk").addEventListener("click", ()=>{
   const n=linkName.value.trim(); const u=normalizeUrl(linkUrl.value);
   if(!n && !u) return;
-  if(editId){ const l=state.links.find(x=>x.id===editId); if(l){ l.name=n||u; l.url=u; } }
-  else { state.links.push({id:uid(), name:n||u, url:u}); }
-  save(); renderWeb(); closeLinkDlg();
+  if(editId){ const l=findLinkAnywhere(editId); if(l){ l.name=n||u; l.url=u; } }
+  else {
+    const item={id:uid(), name:n||u, url:u};
+    if(addFolderId){ const f=topById(addFolderId); if(isFolder(f)) f.items.push(item); }
+    else state.links.push(item);
+  }
+  save(); renderWeb(); if(openFolderId) renderFolder(); closeLinkDlg();
 });
 linkName.addEventListener("keydown", e=>{ if(e.key==="Enter") linkUrl.focus(); });
 linkUrl.addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("linkOk").click(); });
+
+/* ---------- folder rename dialog ---------- */
+const renameMask=document.getElementById("renameMask");
+const renameInput=document.getElementById("renameInput");
+let renameId=null;
+function openRenameDlg(id){ const f=topById(id); if(!isFolder(f)) return; renameId=id; renameInput.value=f.name;
+  renameMask.classList.add("show"); setTimeout(()=>renameInput.focus(),50); }
+function closeRenameDlg(){ renameMask.classList.remove("show"); renameId=null; }
+document.getElementById("renameCancel").addEventListener("click", closeRenameDlg);
+renameMask.addEventListener("click", e=>{ if(e.target===renameMask) closeRenameDlg(); });
+document.getElementById("renameOk").addEventListener("click", ()=>{
+  const v=renameInput.value.trim(); if(!v){ closeRenameDlg(); return; }
+  const f=topById(renameId); if(f){ f.name=v; }
+  save(); renderWeb(); if(openFolderId===renameId) fvTitle.textContent=v; closeRenameDlg();
+});
+renameInput.addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("renameOk").click(); });
 
 /* ---------- todo ---------- */
 const todoList=document.getElementById("todoList");
@@ -425,15 +644,12 @@ function renderTodo(){
     const bg=document.createElement("div"); bg.className="delbg"; bg.textContent="削除";
     const cell=document.createElement("div"); cell.className="cell";
     const tx=document.createElement("div"); tx.className="todo-text"; tx.textContent=t.text;
-    cell.appendChild(tx);
-    row.appendChild(bg); row.appendChild(cell);
-    todoList.appendChild(row);
+    cell.appendChild(tx); row.appendChild(bg); row.appendChild(cell); todoList.appendChild(row);
   });
 }
 function addTodo(){
   const v=todoInput.value.trim(); if(!v) return;
-  state.todos.push({id:uid(), text:v});
-  todoInput.value=""; save(); renderTodo();
+  state.todos.push({id:uid(), text:v}); todoInput.value=""; save(); renderTodo();
 }
 document.getElementById("todoAddBtn").addEventListener("click", addTodo);
 todoInput.addEventListener("keydown", e=>{ if(e.key==="Enter") addTodo(); });
@@ -443,23 +659,17 @@ attachGestures(todoList, {
   onReorder:(ids)=>{ state.todos=reorderBy(state.todos,ids); save(); },
   onDelete:(id)=>{ state.todos=state.todos.filter(x=>x.id!==id); save(); renderTodo(); }
 });
-
-/* todo edit dialog */
 const todoMask=document.getElementById("todoMask");
 const todoEditInput=document.getElementById("todoEditInput");
 let todoEditId=null;
-function openTodoDlg(id){
-  const t=state.todos.find(x=>x.id===id); if(!t) return;
-  todoEditId=id; todoEditInput.value=t.text;
-  todoMask.classList.add("show"); setTimeout(()=>todoEditInput.focus(),50);
-}
+function openTodoDlg(id){ const t=state.todos.find(x=>x.id===id); if(!t) return; todoEditId=id; todoEditInput.value=t.text;
+  todoMask.classList.add("show"); setTimeout(()=>todoEditInput.focus(),50); }
 function closeTodoDlg(){ todoMask.classList.remove("show"); todoEditId=null; }
 document.getElementById("todoCancel").addEventListener("click", closeTodoDlg);
 todoMask.addEventListener("click", e=>{ if(e.target===todoMask) closeTodoDlg(); });
 document.getElementById("todoOk").addEventListener("click", ()=>{
   const v=todoEditInput.value.trim(); if(!v){ closeTodoDlg(); return; }
-  const t=state.todos.find(x=>x.id===todoEditId); if(t) t.text=v;
-  save(); renderTodo(); closeTodoDlg();
+  const t=state.todos.find(x=>x.id===todoEditId); if(t) t.text=v; save(); renderTodo(); closeTodoDlg();
 });
 todoEditInput.addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("todoOk").click(); });
 
