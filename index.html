@@ -137,7 +137,7 @@
     <input id="todoInput" placeholder="新しい予定を入力" enterkeyhint="done">
     <button class="addbtn" id="todoAddBtn">追加</button>
   </div>
-  <div class="hint">長押しで並び替え・左スワイプで削除</div>
+  <div class="hint">タップで編集・長押しで並び替え・左スワイプで削除</div>
   <div class="list" id="todoList"></div>
 </section>
 
@@ -164,6 +164,17 @@
     <div class="dlg-btns">
       <button class="btn-cancel" id="linkCancel">キャンセル</button>
       <button class="btn-ok" id="linkOk">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="todoMask">
+  <div class="dialog">
+    <h3>予定を編集</h3>
+    <input id="todoEditInput" placeholder="予定" enterkeyhint="done">
+    <div class="dlg-btns">
+      <button class="btn-cancel" id="todoCancel">キャンセル</button>
+      <button class="btn-ok" id="todoOk">保存</button>
     </div>
   </div>
 </div>
@@ -428,9 +439,29 @@ document.getElementById("todoAddBtn").addEventListener("click", addTodo);
 todoInput.addEventListener("keydown", e=>{ if(e.key==="Enter") addTodo(); });
 attachGestures(todoList, {
   swipe:'delete',
+  onTap:(id)=>openTodoDlg(id),
   onReorder:(ids)=>{ state.todos=reorderBy(state.todos,ids); save(); },
   onDelete:(id)=>{ state.todos=state.todos.filter(x=>x.id!==id); save(); renderTodo(); }
 });
+
+/* todo edit dialog */
+const todoMask=document.getElementById("todoMask");
+const todoEditInput=document.getElementById("todoEditInput");
+let todoEditId=null;
+function openTodoDlg(id){
+  const t=state.todos.find(x=>x.id===id); if(!t) return;
+  todoEditId=id; todoEditInput.value=t.text;
+  todoMask.classList.add("show"); setTimeout(()=>todoEditInput.focus(),50);
+}
+function closeTodoDlg(){ todoMask.classList.remove("show"); todoEditId=null; }
+document.getElementById("todoCancel").addEventListener("click", closeTodoDlg);
+todoMask.addEventListener("click", e=>{ if(e.target===todoMask) closeTodoDlg(); });
+document.getElementById("todoOk").addEventListener("click", ()=>{
+  const v=todoEditInput.value.trim(); if(!v){ closeTodoDlg(); return; }
+  const t=state.todos.find(x=>x.id===todoEditId); if(t) t.text=v;
+  save(); renderTodo(); closeTodoDlg();
+});
+todoEditInput.addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("todoOk").click(); });
 
 document.addEventListener("gesturestart", e=>e.preventDefault());
 
