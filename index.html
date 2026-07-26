@@ -90,13 +90,13 @@
     background:rgba(255,255,255,.22); color:#fff; cursor:pointer;}
 
   .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:20;
-    height:calc(var(--tabbar) + env(safe-area-inset-bottom));
-    padding-bottom:max(2px, calc(env(safe-area-inset-bottom) - 26px));
+    padding-top:8px;
+    padding-bottom:max(6px, calc(env(safe-area-inset-bottom) - 28px));
     background:rgba(249,249,249,.94); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
     border-top:1px solid rgba(0,0,0,.12); display:flex;}
   .tab{flex:1; border:none;background:none;cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;
-    color:var(--gray); font-size:10px; padding-top:0; padding-bottom:3px;}
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    color:var(--gray); font-size:10px; padding:0;}
   .tab svg{width:23px;height:23px;}
   .tab.on{color:var(--blue);}
 
@@ -841,7 +841,7 @@ registerSW();
 
 /* auto-update: if the deployed version differs, reload once to fetch the latest.
    Beats iOS Home-Screen HTML caching without needing to remove/re-add the app. */
-const APP_VERSION="8";
+const APP_VERSION="9";
 document.getElementById("ver").textContent="v"+APP_VERSION;
 fetch("version.json?"+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(d=>{
   if(d && d.v && d.v!==APP_VERSION){
