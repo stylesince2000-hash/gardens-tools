@@ -841,13 +841,18 @@ registerSW();
 
 /* auto-update: if the deployed version differs, reload once to fetch the latest.
    Beats iOS Home-Screen HTML caching without needing to remove/re-add the app. */
-const APP_VERSION="10";
+const APP_VERSION="11";
 function showDiag(){
   const p=document.createElement("div");
   p.style.cssText="position:fixed;left:0;bottom:0;width:0;height:env(safe-area-inset-bottom);pointer-events:none;";
   document.body.appendChild(p);
   const sab=Math.round(p.getBoundingClientRect().height); p.remove();
-  document.getElementById("ver").textContent="v"+APP_VERSION+" · ih"+window.innerHeight+" sab"+sab+" sa"+(window.navigator.standalone?1:0);
+  const bar=document.querySelector(".tabbar");
+  const tb=bar? Math.round(bar.getBoundingClientRect().bottom):-1;
+  const lab=document.querySelector(".tab.on");
+  const lb=lab? Math.round(lab.getBoundingClientRect().bottom):-1;
+  document.getElementById("ver").textContent=
+    "v"+APP_VERSION+" · ih"+window.innerHeight+" sab"+sab+" sa"+(window.navigator.standalone?1:0)+" · tb"+tb+" lb"+lb;
 }
 showDiag(); window.addEventListener("load", ()=>setTimeout(showDiag,300));
 fetch("version.json?"+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(d=>{
