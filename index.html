@@ -836,6 +836,16 @@ document.addEventListener("gesturestart", e=>e.preventDefault());
 renderCounter(); renderWeb(); renderTodo(); renderCards();
 initCloud();
 registerSW();
+
+/* auto-update: if the deployed version differs, reload once to fetch the latest.
+   Beats iOS Home-Screen HTML caching without needing to remove/re-add the app. */
+const APP_VERSION="7";
+fetch("version.json?"+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(d=>{
+  if(d && d.v && d.v!==APP_VERSION){
+    const k="upd_"+d.v;
+    if(!sessionStorage.getItem(k)){ sessionStorage.setItem(k,"1"); location.reload(); }
+  }
+}).catch(()=>{});
 </script>
 </body>
 </html>
