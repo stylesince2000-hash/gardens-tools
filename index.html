@@ -90,10 +90,10 @@
     background:rgba(255,255,255,.22); color:#fff; cursor:pointer;}
 
   .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:20;
-    padding-top:8px;
-    padding-bottom:max(6px, calc(env(safe-area-inset-bottom) - 28px));
-    background:rgba(249,249,249,.94); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
-    border-top:1px solid rgba(0,0,0,.12); display:flex;}
+    padding-top:9px;
+    padding-bottom:max(8px, env(safe-area-inset-bottom));
+    background:#ffffff; box-shadow:0 -0.5px 0 rgba(0,0,0,.14);
+    border-top:1px solid rgba(0,0,0,.08); display:flex;}
   .tab{flex:1; border:none;background:none;cursor:pointer;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     color:var(--gray); font-size:10px; padding:0;}
@@ -841,20 +841,8 @@ registerSW();
 
 /* auto-update: if the deployed version differs, reload once to fetch the latest.
    Beats iOS Home-Screen HTML caching without needing to remove/re-add the app. */
-const APP_VERSION="11";
-function showDiag(){
-  const p=document.createElement("div");
-  p.style.cssText="position:fixed;left:0;bottom:0;width:0;height:env(safe-area-inset-bottom);pointer-events:none;";
-  document.body.appendChild(p);
-  const sab=Math.round(p.getBoundingClientRect().height); p.remove();
-  const bar=document.querySelector(".tabbar");
-  const tb=bar? Math.round(bar.getBoundingClientRect().bottom):-1;
-  const lab=document.querySelector(".tab.on");
-  const lb=lab? Math.round(lab.getBoundingClientRect().bottom):-1;
-  document.getElementById("ver").textContent=
-    "v"+APP_VERSION+" · ih"+window.innerHeight+" sab"+sab+" sa"+(window.navigator.standalone?1:0)+" · tb"+tb+" lb"+lb;
-}
-showDiag(); window.addEventListener("load", ()=>setTimeout(showDiag,300));
+const APP_VERSION="12";
+document.getElementById("ver").textContent="v"+APP_VERSION;
 fetch("version.json?"+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(d=>{
   if(d && d.v && d.v!==APP_VERSION){
     const k="upd_"+d.v;
