@@ -1,8 +1,6 @@
 {
   "name": "GARDENS",
   "short_name": "GARDENS",
-  "start_url": ".",
-  "scope": ".",
   "display": "standalone",
   "background_color": "#4A3520",
   "theme_color": "#4A3520",
