@@ -11,6 +11,8 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
   :root{
     --blue:#007aff; --brown:#8a6d4f; --bg:#f2f2f7; --card:#ffffff;
@@ -290,9 +292,62 @@ function load(){
   }catch(e){}
   return {counter:{value:0,updated:null}, links:[], todos:[], cards:[]};
 }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function saveLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 let _id = Date.now();
 function uid(){ return "i"+(_id++).toString(36); }
+
+/* ---------- cloud sync (Firebase Realtime DB, reused lounge-ako project) ---------- */
+const FIREBASE_CONFIG={
+  apiKey:"AIzaSyC8JDLV0ByHq-dWB_E97cnv_DVIOmndqPU",
+  authDomain:"lounge-ako.firebaseapp.com",
+  databaseURL:"https://lounge-ako-default-rtdb.firebaseio.com",
+  projectId:"lounge-ako",
+  storageBucket:"lounge-ako.firebasestorage.app",
+  messagingSenderId:"566425981436",
+  appId:"1:566425981436:web:c72b2c7e6bf5d3f6a82279"
+};
+const ROOM='gardens-tools-main';
+let cloudRef=null, cloudOn=false, saveTimer=null, applyingRemote=false;
+function hasFirebase(){ return FIREBASE_CONFIG.apiKey && typeof firebase!=='undefined'; }
+
+/* every mutation calls save(): write locally + push to cloud (debounced) */
+function save(){
+  saveLocal();
+  if(cloudOn && cloudRef && !applyingRemote){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>{ cloudRef.set(state).catch(()=>{}); }, 250);
+  }
+}
+function renderAll(){
+  renderCounter(); renderWeb(); renderTodo(); renderCards();
+  if(openFolderId){ if(topById(openFolderId)) renderFolder(); else closeFolder(); }
+}
+function adopt(data){
+  applyingRemote=true;
+  state.counter = data.counter || {value:0,updated:null};
+  state.links = Array.isArray(data.links)? data.links : [];
+  state.todos = Array.isArray(data.todos)? data.todos.map(t=>({id:t.id,text:t.text})) : [];
+  state.cards = Array.isArray(data.cards)? data.cards : [];
+  saveLocal(); renderAll();
+  applyingRemote=false;
+}
+function initCloud(){
+  if(!hasFirebase()) return;
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    cloudRef=firebase.database().ref('rooms/'+ROOM); cloudOn=true;
+    cloudRef.once('value').then(snap=>{
+      const v=snap.val();
+      if(v && typeof v==='object') adopt(v);          // cloud is source of truth -> restores data
+      else cloudRef.set(state).catch(()=>{});          // first run: seed from this device
+      cloudRef.on('value', s=>{ const d=s.val(); if(d && JSON.stringify(d)!==JSON.stringify(state)) adopt(d); });
+    }).catch(()=>{ cloudOn=false; });
+  }catch(e){ cloudOn=false; }
+}
+function registerSW(){
+  if(!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+}
 
 const isFolder = it => it && Array.isArray(it.items);
 const isLink   = it => it && !Array.isArray(it.items);
@@ -779,6 +834,8 @@ document.addEventListener("gesturestart", e=>e.preventDefault());
 
 /* init */
 renderCounter(); renderWeb(); renderTodo(); renderCards();
+initCloud();
+registerSW();
 </script>
 </body>
 </html>
