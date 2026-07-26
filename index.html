@@ -14,7 +14,7 @@
 <style>
   :root{
     --blue:#007aff; --brown:#8a6d4f; --bg:#f2f2f7; --card:#ffffff;
-    --sep:#e5e5ea; --ink:#1c1c1e; --gray:#8e8e93; --red:#ff3b30; --tabbar:76px;
+    --sep:#e5e5ea; --ink:#1c1c1e; --gray:#8e8e93; --red:#ff3b30; --tabbar:58px;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;height:100%;}
@@ -40,7 +40,9 @@
   .ct-btn{width:64px;height:64px;border-radius:50%;border:none;background:var(--blue);color:#fff;
     font-size:34px; display:flex;align-items:center;justify-content:center; cursor:pointer;}
   .ct-btn:active{opacity:.7; transform:scale(.94);}
-  .ct-when{margin-top:36px;color:var(--gray);font-size:15px;}
+  .ct-reset{margin-top:26px;background:none;border:none;color:var(--blue);font-size:16px;cursor:pointer;padding:6px 16px;}
+  .ct-reset:active{opacity:.6;}
+  .ct-when{margin-top:18px;color:var(--gray);font-size:15px;}
 
   .hdr{padding:8px 18px 4px;}
   .hdr-row{display:flex;align-items:center;justify-content:space-between;min-height:34px;}
@@ -70,10 +72,9 @@
 
   /* subscription cards (wallet) */
   .cardstack{padding:6px 16px 24px;}
-  .wcard{position:relative; border-radius:16px; color:#fff; padding:15px 18px; margin-top:-14px;
-    box-shadow:0 6px 16px rgba(0,0,0,.22); cursor:pointer; overflow:hidden;}
+  .wcard{position:relative; border-radius:16px; color:#fff; padding:15px 18px; margin-top:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,.18); cursor:pointer; overflow:hidden;}
   .wcard:first-child{margin-top:2px;}
-  .wcard.expanded + .wcard{margin-top:14px;}
   .wcard.dragging{z-index:8; box-shadow:0 14px 30px rgba(0,0,0,.32);}
   .wc-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px;}
   .wc-company{font-size:16px; font-weight:600; opacity:.92; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -92,9 +93,9 @@
     background:rgba(249,249,249,.94); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
     border-top:1px solid rgba(0,0,0,.12); display:flex;}
   .tab{flex:1; border:none;background:none;cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    color:var(--gray); font-size:10.5px; padding-top:8px;}
-  .tab svg{width:26px;height:26px;}
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    color:var(--gray); font-size:10px; padding-top:3px;}
+  .tab svg{width:23px;height:23px;}
   .tab.on{color:var(--blue);}
 
   .folderview{position:fixed; inset:0; z-index:30; background:var(--bg); display:none; flex-direction:column;
@@ -151,6 +152,7 @@
     <button class="ct-btn" id="ctMinus" aria-label="減らす">−</button>
     <button class="ct-btn" id="ctPlus" aria-label="増やす">＋</button>
   </div>
+  <button class="ct-reset" id="ctReset">リセット</button>
   <div class="ct-when" id="ctWhen">更新日時：—</div>
 </section>
 
@@ -324,6 +326,11 @@ function renderCounter(){ ctNum.textContent = state.counter.value; ctWhen.textCo
 function bump(n){ const v=state.counter.value+n; if(v<0) return; state.counter.value=v; state.counter.updated=Date.now(); save(); renderCounter(); }
 document.getElementById("ctPlus").addEventListener("click", ()=>bump(1));
 document.getElementById("ctMinus").addEventListener("click", ()=>bump(-1));
+document.getElementById("ctReset").addEventListener("click", ()=>{
+  if(state.counter.value===0) return;
+  if(!confirm("カウントを0にリセットしますか？")) return;
+  state.counter.value=0; state.counter.updated=Date.now(); save(); renderCounter();
+});
 
 /* ---------- action sheet ---------- */
 const sheetMask=document.getElementById("sheetMask");
