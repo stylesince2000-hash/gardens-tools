@@ -5,9 +5,12 @@
 <title>GARDENS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GARDENS">
-<meta name="theme-color" content="#f2f2f7">
+<meta name="theme-color" content="#4A3520">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
   :root{
     --blue:#007aff; --brown:#8a6d4f; --bg:#f2f2f7; --card:#ffffff;
@@ -52,36 +55,43 @@
   .list{position:relative; background:var(--card); border-radius:12px; margin:0 16px; overflow:hidden;}
   .row{position:relative; background:var(--card); overflow:hidden;}
   .row.dragging{z-index:6; box-shadow:0 10px 26px rgba(0,0,0,.18); border-radius:10px; overflow:visible;}
-  .cell{
-    position:relative; z-index:1; background:var(--card);
-    display:flex; align-items:center; gap:12px; padding:15px 16px;
-    -webkit-touch-callout:none;
-  }
-  .row:not(:last-child) .cell::after{
-    content:""; position:absolute; left:0; right:-16px; bottom:0; height:1px; background:var(--sep);
-  }
+  .cell{position:relative; z-index:1; background:var(--card);
+    display:flex; align-items:center; gap:12px; padding:15px 16px; -webkit-touch-callout:none;}
+  .row:not(:last-child) .cell::after{content:""; position:absolute; left:0; right:-16px; bottom:0; height:1px; background:var(--sep);}
   .row.dragging .cell::after{display:none;}
   .row.merge-target .cell{ background:#e9f1ff; box-shadow:inset 0 0 0 2px var(--blue); border-radius:10px; }
-
   .fic{flex:0 0 auto; width:26px; height:26px; display:flex; align-items:center; justify-content:center;}
   .link-name{color:var(--brown); font-size:18px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .folder-name{color:var(--ink); font-size:18px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .count{color:var(--gray); font-size:15px; margin-left:2px;}
   .chev{color:#c7c7cc; font-size:20px;}
   .todo-text{flex:1; font-size:18px; min-width:0; word-break:break-word;}
-
   .drop-line{position:absolute; left:16px; right:16px; height:2px; background:var(--blue); border-radius:2px; z-index:7; pointer-events:none; margin-top:-1px;}
-
-  /* swipe actions */
   .actions{position:absolute; top:0; right:0; bottom:0; display:flex; z-index:0;}
   .act{border:none; color:#fff; font-size:16px; width:76px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
   .act.out{background:#8e8e93;}
   .act.edit{background:#5e5ce6;}
   .act.del{background:var(--red);}
-
   .delbg{position:absolute; inset:0; background:var(--red); display:flex; align-items:center; justify-content:flex-end;
     padding-right:24px; color:#fff; z-index:0; font-size:16px;}
   .empty{color:var(--gray);text-align:center;font-size:16px;padding:40px 20px;}
+
+  /* wallet cards */
+  .cardstack{padding:6px 16px 24px;}
+  .wcard{position:relative; border-radius:16px; color:#fff; padding:15px 18px; margin-top:-48px;
+    box-shadow:0 6px 16px rgba(0,0,0,.22); cursor:pointer; overflow:hidden;}
+  .wcard:first-child{margin-top:2px;}
+  .wcard.expanded + .wcard{margin-top:14px;}
+  .wc-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+  .wc-company{font-size:17px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .wc-amount{font-size:20px; font-weight:800; white-space:nowrap;}
+  .wc-body{display:none; margin-top:14px;}
+  .wcard.expanded .wc-body{display:block;}
+  .wc-item{font-size:15px; opacity:.96;}
+  .wc-memo{font-size:14px; opacity:.9; margin-top:8px; white-space:pre-wrap; word-break:break-word;}
+  .wc-actions{display:flex; gap:10px; margin-top:16px;}
+  .wc-actions button{border:none; border-radius:9px; padding:9px 16px; font-size:14px;
+    background:rgba(255,255,255,.22); color:#fff; cursor:pointer;}
 
   /* tab bar */
   .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:20;
@@ -91,8 +101,8 @@
     border-top:1px solid rgba(0,0,0,.12); display:flex;}
   .tab{flex:1; border:none;background:none;cursor:pointer;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    color:var(--gray); font-size:11px; padding-top:8px;}
-  .tab svg{width:27px;height:27px;}
+    color:var(--gray); font-size:10.5px; padding-top:8px;}
+  .tab svg{width:26px;height:26px;}
   .tab.on{color:var(--blue);}
 
   /* folder view */
@@ -107,11 +117,15 @@
   /* modal */
   .mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60;display:none;align-items:center;justify-content:center;padding:24px;}
   .mask.show{display:flex;}
-  .dialog{background:var(--card);border-radius:16px;width:100%;max-width:330px;padding:20px;}
+  .dialog{background:var(--card);border-radius:16px;width:100%;max-width:330px;padding:20px;max-height:86vh;overflow-y:auto;}
   .dialog h3{margin:2px 0 16px;font-size:19px;text-align:center;}
-  .dialog input{width:100%;border:none;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:16px;
-    margin-bottom:10px;color:var(--ink);-webkit-user-select:text;user-select:text;}
-  .dialog input:focus{outline:2px solid var(--blue);}
+  .dialog input,.dialog textarea{width:100%;border:none;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:16px;
+    margin-bottom:10px;color:var(--ink);font-family:inherit;-webkit-user-select:text;user-select:text;}
+  .dialog textarea{min-height:70px;resize:none;}
+  .dialog input:focus,.dialog textarea:focus{outline:2px solid var(--blue);}
+  .swatches{display:flex;gap:10px;margin:2px 0 14px;flex-wrap:wrap;}
+  .sw{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
+  .sw.on{border-color:var(--ink);}
   .dlg-btns{display:flex;gap:10px;margin-top:8px;}
   .dlg-btns button{flex:1;border:none;border-radius:10px;padding:12px;font-size:16px;cursor:pointer;}
   .btn-cancel{background:var(--bg);color:var(--ink);}
@@ -155,6 +169,15 @@
   <div class="list" id="todoList"></div>
 </section>
 
+<section id="tab-cards" class="panel">
+  <div class="hdr">
+    <div class="hdr-row"><span></span><button class="hbtn plus" id="cardAdd">＋</button></div>
+    <div class="hdr-title">カード</div>
+  </div>
+  <div class="hint">カードをタップで開く・「＋」で追加</div>
+  <div class="cardstack" id="cardStack"></div>
+</section>
+
 <nav class="tabbar">
   <button class="tab on" data-tab="counter">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h6M7 5v6"/><path d="M14 17h6"/><path d="M5 19l4-4M9 19l-4-4"/></svg>
@@ -167,6 +190,10 @@
   <button class="tab" data-tab="todo">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5-5.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     ToDo
+  </button>
+  <button class="tab" data-tab="cards">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10.5h18" stroke-linecap="round"/></svg>
+    カード
   </button>
 </nav>
 
@@ -205,11 +232,26 @@
 
 <div class="mask" id="renameMask">
   <div class="dialog">
-    <h3>フォルダ名を変更</h3>
+    <h3>フォルダ名</h3>
     <input id="renameInput" placeholder="フォルダ名" enterkeyhint="done">
     <div class="dlg-btns">
       <button class="btn-cancel" id="renameCancel">キャンセル</button>
       <button class="btn-ok" id="renameOk">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="cardMask">
+  <div class="dialog">
+    <h3 id="cardDlgTitle">カードを追加</h3>
+    <input id="cCompany" placeholder="会社名" enterkeyhint="next">
+    <input id="cItem" placeholder="品名" enterkeyhint="next">
+    <input id="cAmount" placeholder="金額（例：12000）" inputmode="numeric" enterkeyhint="next">
+    <textarea id="cMemo" placeholder="メモ"></textarea>
+    <div class="swatches" id="cSwatches"></div>
+    <div class="dlg-btns">
+      <button class="btn-cancel" id="cardCancel">キャンセル</button>
+      <button class="btn-ok" id="cardOk">保存</button>
     </div>
   </div>
 </div>
@@ -227,10 +269,11 @@ function load(){
       s.counter = s.counter || {value:0,updated:null};
       s.links = Array.isArray(s.links)? s.links : [];
       s.todos = Array.isArray(s.todos)? s.todos.map(t=>({id:t.id, text:t.text})) : [];
+      s.cards = Array.isArray(s.cards)? s.cards : [];
       return s;
     }
   }catch(e){}
-  return {counter:{value:0,updated:null}, links:[], todos:[]};
+  return {counter:{value:0,updated:null}, links:[], todos:[], cards:[]};
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 let _id = Date.now();
@@ -286,16 +329,8 @@ function reorderBy(arr, ids){
   const m = new Map(arr.map(o=>[o.id,o]));
   return ids.map(id=>m.get(id)).filter(Boolean);
 }
-
-/*
- opts:
-  swipe:'reveal'|'delete', actionsWidth, onTap(id), onDelete(id),
-  onReorder(ids)                       // non-folder lists (live shuffle)
-  folders:true, canMerge(a,b), onDrop({draggedId,mergeId,index})  // web top list
-*/
 function attachGestures(listEl, opts){
   let row, cell, sx, sy, curY, t0, mode, lpTimer, grabOffset, revealW;
-  // folders-mode drag vars
   let slots, draggedTop, mergeEl, mergeId, dropIndex, dropLine;
   const getPt = e => e.touches? (e.touches[0]||e.changedTouches[0]) : e;
 
@@ -314,23 +349,17 @@ function attachGestures(listEl, opts){
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
   }
-
   function onLongPress(){
     if(mode!=="pending") return;
-    mode="drag";
-    row.classList.add("dragging");
-    if(cell) cell.style.transition="";
+    mode="drag"; row.classList.add("dragging"); if(cell) cell.style.transition="";
     if(navigator.vibrate) navigator.vibrate(12);
     if(opts.folders){
       slots=[...listEl.querySelectorAll(".row")].map(r=>({el:r,id:r.dataset.id,rect:r.getBoundingClientRect()}));
       const d=slots.find(s=>s.id===row.dataset.id); draggedTop=d.rect.top; grabOffset=curY-draggedTop;
       mergeEl=null; mergeId=null; dropIndex=null;
       dropLine=document.createElement("div"); dropLine.className="drop-line"; dropLine.style.display="none"; listEl.appendChild(dropLine);
-    } else {
-      grabOffset = curY - row.getBoundingClientRect().top;
-    }
+    } else grabOffset = curY - row.getBoundingClientRect().top;
   }
-
   function onMove(e){
     const p=getPt(e); const dx=p.clientX-sx, dy=p.clientY-sy; curY=p.clientY;
     if(mode==="pending"){
@@ -347,53 +376,39 @@ function attachGestures(listEl, opts){
       if(opts.swipe==='reveal' && tx < -revealW-40) tx=-revealW-40;
       cell.style.transform=`translateX(${tx}px)`; return;
     }
-    if(mode==="drag"){
-      e.preventDefault();
-      if(opts.folders) dragFolders(); else dragShuffle();
-    }
+    if(mode==="drag"){ e.preventDefault(); if(opts.folders) dragFolders(); else dragShuffle(); }
   }
-
   function dragShuffle(){
-    const y=curY;
-    row.style.transform="none";
-    const dr=row.getBoundingClientRect();
-    const center=(y-grabOffset)+dr.height/2;
+    const y=curY; row.style.transform="none";
+    const dr=row.getBoundingClientRect(); const center=(y-grabOffset)+dr.height/2;
     const sibs=[...listEl.querySelectorAll("[data-id]")].filter(s=>s!==row);
     let ref=null;
     for(const s of sibs){ const rr=s.getBoundingClientRect(); if(center<rr.top+rr.height/2){ ref=s; break; } }
     if(ref) listEl.insertBefore(row, ref); else listEl.appendChild(row);
-    row.style.transform="none";
-    const nr=row.getBoundingClientRect();
+    row.style.transform="none"; const nr=row.getBoundingClientRect();
     row.style.transform=`translateY(${y-grabOffset-nr.top}px)`;
   }
-
   function dragFolders(){
-    const y=curY;
-    row.style.transform=`translateY(${y-grabOffset-draggedTop}px)`;
+    const y=curY; row.style.transform=`translateY(${y-grabOffset-draggedTop}px)`;
     if(mergeEl){ mergeEl.classList.remove("merge-target"); mergeEl=null; mergeId=null; }
     const others=slots.filter(s=>s.id!==row.dataset.id);
-    let hov=null;
-    for(const s of others){ if(y>=s.rect.top && y<=s.rect.bottom){ hov=s; break; } }
+    let hov=null; for(const s of others){ if(y>=s.rect.top && y<=s.rect.bottom){ hov=s; break; } }
     let merge=false;
     if(hov){
       const rel=(y-hov.rect.top)/hov.rect.height;
       if(rel>=0.3 && rel<=0.7 && opts.canMerge(row.dataset.id, hov.id)){
-        mergeEl=hov.el; mergeId=hov.id; mergeEl.classList.add("merge-target");
-        merge=true; dropIndex=null; dropLine.style.display="none";
+        mergeEl=hov.el; mergeId=hov.id; mergeEl.classList.add("merge-target"); merge=true; dropIndex=null; dropLine.style.display="none";
       }
     }
     if(!merge){
       let idx=0; for(const s of others){ if(y > (s.rect.top+s.rect.bottom)/2) idx++; }
       dropIndex=idx;
       if(others.length===0){ dropLine.style.display="none"; }
-      else {
-        const listTop=listEl.getBoundingClientRect().top;
-        const t = (idx===0)? others[0].rect.top : others[idx-1].rect.bottom;
-        dropLine.style.top=(t-listTop)+"px"; dropLine.style.display="block";
-      }
+      else { const listTop=listEl.getBoundingClientRect().top;
+        const t=(idx===0)? others[0].rect.top : others[idx-1].rect.bottom;
+        dropLine.style.top=(t-listTop)+"px"; dropLine.style.display="block"; }
     }
   }
-
   function onEnd(e){
     clearTimeout(lpTimer);
     if(mode==="pending"){
@@ -419,19 +434,15 @@ function attachGestures(listEl, opts){
         if(dropLine){ dropLine.remove(); dropLine=null; }
         if(mergeEl){ mergeEl.classList.remove("merge-target"); }
         opts.onDrop({draggedId:row.dataset.id, mergeId:mergeId, index:dropIndex});
-      } else {
-        opts.onReorder([...listEl.querySelectorAll("[data-id]")].map(el=>el.dataset.id));
-      }
+      } else opts.onReorder([...listEl.querySelectorAll("[data-id]")].map(el=>el.dataset.id));
     }
     cleanup();
   }
   function snapBack(){ cell.style.transition="transform .2s"; cell.style.transform="translateX(0)"; }
   function cleanup(){
     mode=null;
-    window.removeEventListener("touchmove", onMove);
-    window.removeEventListener("touchend", onEnd);
-    window.removeEventListener("touchcancel", onEnd);
-    window.removeEventListener("mousemove", onMove);
+    window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onEnd);
+    window.removeEventListener("touchcancel", onEnd); window.removeEventListener("mousemove", onMove);
     window.removeEventListener("mouseup", onEnd);
   }
   listEl.addEventListener("touchstart", onStart, {passive:true});
@@ -442,21 +453,19 @@ function attachGestures(listEl, opts){
 const webList = document.getElementById("webList");
 const FOLDER_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="#e0b877"><path d="M4 5h5l2 2h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>';
 function normalizeUrl(u){ u=u.trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u; return u; }
-
 function makeLinkRow(l){
   const row=document.createElement("div"); row.className="row"; row.dataset.id=l.id;
   const acts=document.createElement("div"); acts.className="actions";
   const ed=document.createElement("button"); ed.className="act edit"; ed.textContent="編集";
   ed.addEventListener("click",ev=>{ev.stopPropagation(); closeOpenRow(); openLinkDlg(l.id);});
   const de=document.createElement("button"); de.className="act del"; de.textContent="削除";
-  de.addEventListener("click",ev=>{ev.stopPropagation(); deleteLinkTop(l.id);});
+  de.addEventListener("click",ev=>{ev.stopPropagation(); state.links=state.links.filter(x=>x.id!==l.id); save(); renderWeb();});
   acts.appendChild(ed); acts.appendChild(de);
   const cell=document.createElement("div"); cell.className="cell";
   const name=document.createElement("div"); name.className="link-name"; name.textContent=l.name;
   const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
   cell.appendChild(name); cell.appendChild(chev);
-  row.appendChild(acts); row.appendChild(cell);
-  return row;
+  row.appendChild(acts); row.appendChild(cell); return row;
 }
 function makeFolderRow(f){
   const row=document.createElement("div"); row.className="row"; row.dataset.id=f.id;
@@ -472,8 +481,7 @@ function makeFolderRow(f){
   const cnt=document.createElement("div"); cnt.className="count"; cnt.textContent="("+f.items.length+")";
   const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
   cell.appendChild(ic); cell.appendChild(name); cell.appendChild(cnt); cell.appendChild(chev);
-  row.appendChild(acts); row.appendChild(cell);
-  return row;
+  row.appendChild(acts); row.appendChild(cell); return row;
 }
 function renderWeb(){
   webList.innerHTML=""; openRow=null;
@@ -484,7 +492,6 @@ function renderWeb(){
   document.querySelector('#tab-web .hint').style.visibility="visible";
   state.links.forEach(it=>{ webList.appendChild(isFolder(it)? makeFolderRow(it) : makeLinkRow(it)); });
 }
-function deleteLinkTop(id){ state.links=state.links.filter(x=>x.id!==id); save(); renderWeb(); }
 function deleteFolder(id){
   const f=topById(id); if(!f) return;
   const msg = f.items.length? `フォルダ「${f.name}」と中の ${f.items.length} 件を削除しますか？` : `フォルダ「${f.name}」を削除しますか？`;
@@ -507,9 +514,13 @@ attachGestures(webList, {
       state.links.splice(dIdx,1);
       const tIdx=state.links.findIndex(x=>x.id===mergeId); if(tIdx<0){ state.links.splice(dIdx,0,dragged); return; }
       const target=state.links[tIdx];
-      if(isFolder(target)) target.items.push(dragged);
-      else state.links.splice(tIdx,1,{id:uid(), name:"フォルダ", items:[target, dragged]});
-      save(); renderWeb(); return;
+      if(isFolder(target)){ target.items.push(dragged); save(); renderWeb(); }
+      else {
+        const nf={id:uid(), name:"フォルダ", items:[target, dragged]};
+        state.links.splice(tIdx,1,nf); save(); renderWeb();
+        openRenameDlg(nf.id, true);   // ask a name right away for a new folder
+      }
+      return;
     }
     const others=state.links.filter(x=>x.id!==draggedId);
     const i=Math.max(0, Math.min(index==null?others.length:index, others.length));
@@ -552,13 +563,11 @@ function renderFolder(){
     folderList.appendChild(row);
   });
 }
-/* dissolve folder down to a plain link when 1 item, or remove when empty */
 function afterFolderChange(){
   const f=currentFolder(); if(!f){ save(); renderWeb(); return; }
   if(f.items.length<=1){
     const idx=state.links.indexOf(f);
-    if(f.items.length===1) state.links.splice(idx,1,f.items[0]);
-    else state.links.splice(idx,1);
+    if(f.items.length===1) state.links.splice(idx,1,f.items[0]); else state.links.splice(idx,1);
     save(); closeFolder(); renderWeb();
   } else { save(); renderFolder(); renderWeb(); }
 }
@@ -591,8 +600,7 @@ function openLinkDlg(id, folderId){
   editId=id||null; addFolderId=folderId||null;
   const l = id? findLinkAnywhere(id) : null;
   document.getElementById("linkDlgTitle").textContent = l? "リンクを編集" : "リンクを追加";
-  linkName.value = l? l.name : "";
-  linkUrl.value = l? (l.url||"") : "";
+  linkName.value = l? l.name : ""; linkUrl.value = l? (l.url||"") : "";
   linkMask.classList.add("show"); setTimeout(()=>linkName.focus(),50);
 }
 function closeLinkDlg(){ linkMask.classList.remove("show"); editId=null; addFolderId=null; }
@@ -617,8 +625,12 @@ linkUrl.addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElement
 const renameMask=document.getElementById("renameMask");
 const renameInput=document.getElementById("renameInput");
 let renameId=null;
-function openRenameDlg(id){ const f=topById(id); if(!isFolder(f)) return; renameId=id; renameInput.value=f.name;
-  renameMask.classList.add("show"); setTimeout(()=>renameInput.focus(),50); }
+function openRenameDlg(id, isNew){
+  const f=topById(id); if(!isFolder(f)) return;
+  renameId=id; renameInput.value=f.name;
+  renameMask.classList.add("show");
+  setTimeout(()=>{ renameInput.focus(); if(isNew) renameInput.select(); },50);
+}
 function closeRenameDlg(){ renameMask.classList.remove("show"); renameId=null; }
 document.getElementById("renameCancel").addEventListener("click", closeRenameDlg);
 renameMask.addEventListener("click", e=>{ if(e.target===renameMask) closeRenameDlg(); });
@@ -673,10 +685,80 @@ document.getElementById("todoOk").addEventListener("click", ()=>{
 });
 todoEditInput.addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("todoOk").click(); });
 
+/* ---------- cards (wallet) ---------- */
+const cardStack=document.getElementById("cardStack");
+const CARD_COLORS=["#3a6ea5","#c0562f","#4b8b6f","#6a5acd","#b5843a","#4a4a4a","#a63a5b","#2f7d8f"];
+let expandedCard=null;
+function fmtAmount(a){
+  if(a==null || a==="") return "";
+  const n=String(a).replace(/[^\d.\-]/g,"");
+  if(n!=="" && /^-?\d+(\.\d+)?$/.test(n)) return "¥"+Number(n).toLocaleString();
+  return a;
+}
+function renderCards(){
+  cardStack.innerHTML="";
+  if(state.cards.length===0){
+    const e=document.createElement("div"); e.className="empty"; e.textContent="「＋」でカードを追加"; cardStack.appendChild(e);
+    document.querySelector('#tab-cards .hint').style.visibility="hidden"; return;
+  }
+  document.querySelector('#tab-cards .hint').style.visibility="visible";
+  state.cards.forEach(c=>{
+    const el=document.createElement("div"); el.className="wcard"+(expandedCard===c.id?" expanded":"");
+    el.style.background=c.color||"#4a4a4a"; el.dataset.id=c.id;
+    const head=document.createElement("div"); head.className="wc-head";
+    const co=document.createElement("div"); co.className="wc-company"; co.textContent=c.company||"（会社名なし）";
+    const am=document.createElement("div"); am.className="wc-amount"; am.textContent=fmtAmount(c.amount);
+    head.appendChild(co); head.appendChild(am);
+    const body=document.createElement("div"); body.className="wc-body";
+    if(c.item){ const it=document.createElement("div"); it.className="wc-item"; it.textContent="品名："+c.item; body.appendChild(it); }
+    if(c.memo){ const mm=document.createElement("div"); mm.className="wc-memo"; mm.textContent=c.memo; body.appendChild(mm); }
+    const acts=document.createElement("div"); acts.className="wc-actions";
+    const ed=document.createElement("button"); ed.textContent="編集"; ed.addEventListener("click",ev=>{ev.stopPropagation(); openCardDlg(c.id);});
+    const de=document.createElement("button"); de.textContent="削除"; de.addEventListener("click",ev=>{ev.stopPropagation();
+      if(confirm("このカードを削除しますか？")){ state.cards=state.cards.filter(x=>x.id!==c.id); if(expandedCard===c.id)expandedCard=null; save(); renderCards(); } });
+    acts.appendChild(ed); acts.appendChild(de); body.appendChild(acts);
+    el.appendChild(head); el.appendChild(body);
+    el.addEventListener("click",()=>{ expandedCard = (expandedCard===c.id)? null : c.id; renderCards(); });
+    cardStack.appendChild(el);
+  });
+}
+/* card dialog */
+const cardMask=document.getElementById("cardMask");
+const cCompany=document.getElementById("cCompany"), cItem=document.getElementById("cItem"),
+      cAmount=document.getElementById("cAmount"), cMemo=document.getElementById("cMemo"),
+      cSwatches=document.getElementById("cSwatches");
+let cardEditId=null, cardColor=CARD_COLORS[0];
+CARD_COLORS.forEach(col=>{
+  const s=document.createElement("div"); s.className="sw"; s.style.background=col; s.dataset.col=col;
+  s.addEventListener("click",()=>{ cardColor=col; cSwatches.querySelectorAll(".sw").forEach(x=>x.classList.toggle("on",x.dataset.col===col)); });
+  cSwatches.appendChild(s);
+});
+function paintSwatches(){ cSwatches.querySelectorAll(".sw").forEach(x=>x.classList.toggle("on",x.dataset.col===cardColor)); }
+function openCardDlg(id){
+  cardEditId=id||null;
+  const c=id? state.cards.find(x=>x.id===id) : null;
+  document.getElementById("cardDlgTitle").textContent = c? "カードを編集" : "カードを追加";
+  cCompany.value=c?c.company:""; cItem.value=c?(c.item||""):""; cAmount.value=c?(c.amount||""):""; cMemo.value=c?(c.memo||""):"";
+  cardColor = c? (c.color||CARD_COLORS[0]) : CARD_COLORS[state.cards.length % CARD_COLORS.length];
+  paintSwatches();
+  cardMask.classList.add("show"); setTimeout(()=>cCompany.focus(),50);
+}
+function closeCardDlg(){ cardMask.classList.remove("show"); cardEditId=null; }
+document.getElementById("cardAdd").addEventListener("click", ()=>openCardDlg());
+document.getElementById("cardCancel").addEventListener("click", closeCardDlg);
+cardMask.addEventListener("click", e=>{ if(e.target===cardMask) closeCardDlg(); });
+document.getElementById("cardOk").addEventListener("click", ()=>{
+  const company=cCompany.value.trim(), item=cItem.value.trim(), amount=cAmount.value.trim(), memo=cMemo.value.trim();
+  if(!company && !item && !amount && !memo) return;
+  if(cardEditId){ const c=state.cards.find(x=>x.id===cardEditId); if(c){ c.company=company; c.item=item; c.amount=amount; c.memo=memo; c.color=cardColor; } }
+  else { const c={id:uid(), company, item, amount, memo, color:cardColor}; state.cards.push(c); expandedCard=c.id; }
+  save(); renderCards(); closeCardDlg();
+});
+
 document.addEventListener("gesturestart", e=>e.preventDefault());
 
 /* init */
-renderCounter(); renderWeb(); renderTodo();
+renderCounter(); renderWeb(); renderTodo(); renderCards();
 </script>
 </body>
 </html>
