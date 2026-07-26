@@ -32,7 +32,6 @@
   }
   .panel.active{display:block;}
 
-  /* Counter */
   #tab-counter{display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
   #tab-counter.active{display:flex;}
   .ct-label{color:var(--gray); font-size:20px; margin-bottom:24px;}
@@ -43,7 +42,6 @@
   .ct-btn:active{opacity:.7; transform:scale(.94);}
   .ct-when{margin-top:36px;color:var(--gray);font-size:15px;}
 
-  /* header */
   .hdr{padding:8px 18px 4px;}
   .hdr-row{display:flex;align-items:center;justify-content:space-between;min-height:34px;}
   .hdr-title{font-size:34px;font-weight:800;letter-spacing:-.5px;margin:2px 0 12px;}
@@ -51,7 +49,6 @@
   .hbtn.plus{font-size:30px;font-weight:300;line-height:1;}
   .hint{color:var(--gray);font-size:12.5px;padding:0 18px 8px;}
 
-  /* list */
   .list{position:relative; background:var(--card); border-radius:12px; margin:0 16px; overflow:hidden;}
   .row{position:relative; background:var(--card); overflow:hidden;}
   .row.dragging{z-index:6; box-shadow:0 10px 26px rgba(0,0,0,.18); border-radius:10px; overflow:visible;}
@@ -67,33 +64,28 @@
   .chev{color:#c7c7cc; font-size:20px;}
   .todo-text{flex:1; font-size:18px; min-width:0; word-break:break-word;}
   .drop-line{position:absolute; left:16px; right:16px; height:2px; background:var(--blue); border-radius:2px; z-index:7; pointer-events:none; margin-top:-1px;}
-  .actions{position:absolute; top:0; right:0; bottom:0; display:flex; z-index:0;}
-  .act{border:none; color:#fff; font-size:16px; width:76px; display:flex; align-items:center; justify-content:center; cursor:pointer;}
-  .act.out{background:#8e8e93;}
-  .act.edit{background:#5e5ce6;}
-  .act.del{background:var(--red);}
   .delbg{position:absolute; inset:0; background:var(--red); display:flex; align-items:center; justify-content:flex-end;
     padding-right:24px; color:#fff; z-index:0; font-size:16px;}
   .empty{color:var(--gray);text-align:center;font-size:16px;padding:40px 20px;}
 
-  /* wallet cards */
+  /* subscription cards (wallet) */
   .cardstack{padding:6px 16px 24px;}
-  .wcard{position:relative; border-radius:16px; color:#fff; padding:15px 18px; margin-top:-48px;
+  .wcard{position:relative; border-radius:16px; color:#fff; padding:15px 18px; margin-top:-14px;
     box-shadow:0 6px 16px rgba(0,0,0,.22); cursor:pointer; overflow:hidden;}
   .wcard:first-child{margin-top:2px;}
   .wcard.expanded + .wcard{margin-top:14px;}
-  .wc-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
-  .wc-company{font-size:17px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .wc-amount{font-size:20px; font-weight:800; white-space:nowrap;}
+  .wcard.dragging{z-index:8; box-shadow:0 14px 30px rgba(0,0,0,.32);}
+  .wc-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px;}
+  .wc-company{font-size:16px; font-weight:600; opacity:.92; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .wc-title{font-size:19px; font-weight:800; text-align:right; min-width:0; max-width:62%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .wc-body{display:none; margin-top:14px;}
   .wcard.expanded .wc-body{display:block;}
-  .wc-item{font-size:15px; opacity:.96;}
+  .wc-amount{font-size:18px; font-weight:700;}
   .wc-memo{font-size:14px; opacity:.9; margin-top:8px; white-space:pre-wrap; word-break:break-word;}
   .wc-actions{display:flex; gap:10px; margin-top:16px;}
   .wc-actions button{border:none; border-radius:9px; padding:9px 16px; font-size:14px;
     background:rgba(255,255,255,.22); color:#fff; cursor:pointer;}
 
-  /* tab bar */
   .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:20;
     height:calc(var(--tabbar) + env(safe-area-inset-bottom));
     padding-bottom:env(safe-area-inset-bottom);
@@ -105,7 +97,6 @@
   .tab svg{width:26px;height:26px;}
   .tab.on{color:var(--blue);}
 
-  /* folder view */
   .folderview{position:fixed; inset:0; z-index:30; background:var(--bg); display:none; flex-direction:column;
     padding-top:env(safe-area-inset-top); padding-bottom:calc(var(--tabbar) + env(safe-area-inset-bottom));}
   .folderview.show{display:flex;}
@@ -114,7 +105,6 @@
   .fv-back{color:var(--blue); font-size:17px; background:none; border:none; cursor:pointer; white-space:nowrap;}
   .fv-list-wrap{overflow-y:auto; -webkit-overflow-scrolling:touch; padding-top:4px;}
 
-  /* modal */
   .mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60;display:none;align-items:center;justify-content:center;padding:24px;}
   .mask.show{display:flex;}
   .dialog{background:var(--card);border-radius:16px;width:100%;max-width:330px;padding:20px;max-height:86vh;overflow-y:auto;}
@@ -130,6 +120,20 @@
   .dlg-btns button{flex:1;border:none;border-radius:10px;padding:12px;font-size:16px;cursor:pointer;}
   .btn-cancel{background:var(--bg);color:var(--ink);}
   .btn-ok{background:var(--blue);color:#fff;font-weight:600;}
+
+  /* long-press action sheet */
+  .sheet-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:70;display:none;align-items:flex-end;justify-content:center;
+    padding:10px calc(10px + env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom));}
+  .sheet-mask.show{display:flex;}
+  .sheet{width:100%;max-width:440px;}
+  .sheet-group{background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:8px;}
+  .sheet-title{text-align:center;color:var(--gray);font-size:13px;padding:14px 16px;border-bottom:1px solid var(--sep);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sheet-group button{width:100%;border:none;background:var(--card);padding:16px;font-size:18px;color:var(--blue);cursor:pointer;
+    border-bottom:1px solid var(--sep);}
+  .sheet-group button:last-child{border-bottom:none;}
+  .sheet-group button.danger{color:var(--red);}
+  .sheet-cancel{width:100%;border:none;background:var(--card);border-radius:14px;padding:16px;font-size:18px;font-weight:600;color:var(--blue);cursor:pointer;}
 
   .todo-add{display:flex;align-items:center;gap:10px;padding:0 16px 6px;}
   .todo-add input{flex:1;border:none;background:var(--card);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--ink);
@@ -155,7 +159,7 @@
     <div class="hdr-row"><span></span><button class="hbtn plus" id="webAdd">＋</button></div>
     <div class="hdr-title">リンク一覧</div>
   </div>
-  <div class="hint">タップで開く・長押しで移動（中央に重ねてフォルダ）・左スワイプで編集/削除</div>
+  <div class="hint">タップで開く・長押しでメニュー（編集/削除）・長押しして移動で並び替え（中央に重ねてフォルダ）</div>
   <div class="list" id="webList"></div>
 </section>
 
@@ -172,9 +176,9 @@
 <section id="tab-cards" class="panel">
   <div class="hdr">
     <div class="hdr-row"><span></span><button class="hbtn plus" id="cardAdd">＋</button></div>
-    <div class="hdr-title">カード</div>
+    <div class="hdr-title">サブスク</div>
   </div>
-  <div class="hint">カードをタップで開く・「＋」で追加</div>
+  <div class="hint">タップで開く・長押しして移動で並び替え・「＋」で追加</div>
   <div class="cardstack" id="cardStack"></div>
 </section>
 
@@ -192,8 +196,8 @@
     ToDo
   </button>
   <button class="tab" data-tab="cards">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10.5h18" stroke-linecap="round"/></svg>
-    カード
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>
+    サブスク
   </button>
 </nav>
 
@@ -203,7 +207,7 @@
     <div class="fv-title" id="fvTitle">フォルダ</div>
     <button class="hbtn plus" id="fvAdd">＋</button>
   </div>
-  <div class="hint" style="text-align:center;">名前をタップで変更・長押しで並び替え・左スワイプで出す/編集/削除</div>
+  <div class="hint" style="text-align:center;">名前をタップで変更・タップで開く・長押しでメニュー・長押しして移動で並び替え</div>
   <div class="fv-list-wrap"><div class="list" id="folderList"></div></div>
 </section>
 
@@ -243,16 +247,26 @@
 
 <div class="mask" id="cardMask">
   <div class="dialog">
-    <h3 id="cardDlgTitle">カードを追加</h3>
+    <h3 id="cardDlgTitle">サブスクを追加</h3>
     <input id="cCompany" placeholder="会社名" enterkeyhint="next">
-    <input id="cItem" placeholder="品名" enterkeyhint="next">
-    <input id="cAmount" placeholder="金額（例：12000）" inputmode="numeric" enterkeyhint="next">
+    <input id="cItem" placeholder="品名（プラン名など）" enterkeyhint="next">
+    <input id="cAmount" placeholder="金額（例：1480）" inputmode="numeric" enterkeyhint="next">
     <textarea id="cMemo" placeholder="メモ"></textarea>
     <div class="swatches" id="cSwatches"></div>
     <div class="dlg-btns">
       <button class="btn-cancel" id="cardCancel">キャンセル</button>
       <button class="btn-ok" id="cardOk">保存</button>
     </div>
+  </div>
+</div>
+
+<div class="sheet-mask" id="sheetMask">
+  <div class="sheet">
+    <div class="sheet-group">
+      <div class="sheet-title" id="sheetTitle"></div>
+      <div id="sheetActions"></div>
+    </div>
+    <button class="sheet-cancel" id="sheetCancel">キャンセル</button>
   </div>
 </div>
 
@@ -291,7 +305,7 @@ function findLinkAnywhere(id){
 /* ---------- tabs ---------- */
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click", ()=>{
-    closeOpenRow(); closeFolder();
+    closeFolder();
     const name = t.dataset.tab;
     document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on", x===t));
     document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active", p.id==="tab-"+name));
@@ -306,75 +320,93 @@ function fmtDT(ms){
   const d = new Date(ms), p = n=>String(n).padStart(2,"0");
   return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
-function renderCounter(){
-  ctNum.textContent = state.counter.value;
-  ctWhen.textContent = "更新日時：" + fmtDT(state.counter.updated);
-}
-function bump(n){
-  const v = state.counter.value + n;
-  if(v < 0) return;
-  state.counter.value = v; state.counter.updated = Date.now();
-  save(); renderCounter();
-}
+function renderCounter(){ ctNum.textContent = state.counter.value; ctWhen.textContent = "更新日時：" + fmtDT(state.counter.updated); }
+function bump(n){ const v=state.counter.value+n; if(v<0) return; state.counter.value=v; state.counter.updated=Date.now(); save(); renderCounter(); }
 document.getElementById("ctPlus").addEventListener("click", ()=>bump(1));
 document.getElementById("ctMinus").addEventListener("click", ()=>bump(-1));
 
-/* ---------- gesture engine ---------- */
-const SLOP=8, LONGPRESS=340;
-let openRow=null;
-function closeOpenRow(){
-  if(openRow){ const c=openRow.querySelector(".cell"); if(c){ c.style.transition="transform .2s"; c.style.transform="translateX(0)"; } openRow=null; }
+/* ---------- action sheet ---------- */
+const sheetMask=document.getElementById("sheetMask");
+const sheetTitle=document.getElementById("sheetTitle");
+const sheetActions=document.getElementById("sheetActions");
+function showSheet(title, actions){
+  sheetTitle.textContent=title||""; sheetTitle.style.display=title?"block":"none";
+  sheetActions.innerHTML="";
+  actions.forEach(a=>{
+    const b=document.createElement("button"); b.textContent=a.label; if(a.danger) b.classList.add("danger");
+    b.addEventListener("click", ()=>{ closeSheet(); a.fn(); });
+    sheetActions.appendChild(b);
+  });
+  sheetMask.classList.add("show");
 }
-function reorderBy(arr, ids){
-  const m = new Map(arr.map(o=>[o.id,o]));
-  return ids.map(id=>m.get(id)).filter(Boolean);
-}
+function closeSheet(){ sheetMask.classList.remove("show"); }
+document.getElementById("sheetCancel").addEventListener("click", closeSheet);
+sheetMask.addEventListener("click", e=>{ if(e.target===sheetMask) closeSheet(); });
+
+/* ---------- gesture engine ----------
+   tap  -> onTap(id)
+   long-press (still) -> onHold(id)   [menu]   or, if none, onTap
+   long-press + move  -> drag (reorder; folders: also merge)
+   swipe (opts.swipe) -> reveal/delete
+------------------------------------- */
+const SLOP=8, LONGPRESS=340, HOLD_MOVE=7;
+function reorderBy(arr, ids){ const m=new Map(arr.map(o=>[o.id,o])); return ids.map(id=>m.get(id)).filter(Boolean); }
+let swipeOpenRow=null;
+function closeOpenRow(){ if(swipeOpenRow){ const c=swipeOpenRow.querySelector(".cell"); if(c){ c.style.transition="transform .2s"; c.style.transform="translateX(0)"; } swipeOpenRow=null; } }
+
 function attachGestures(listEl, opts){
-  let row, cell, sx, sy, curY, t0, mode, lpTimer, grabOffset, revealW;
+  let row, cell, sx, sy, curX, curY, hx, hy, t0, mode, lpTimer, grabOffset, revealW;
   let slots, draggedTop, mergeEl, mergeId, dropIndex, dropLine;
   const getPt = e => e.touches? (e.touches[0]||e.changedTouches[0]) : e;
+  const rowSel = opts.rowSelector || ".row";
 
   function onStart(e){
     if(mode) return;
-    if(e.target.closest(".actions")) return;
+    if(e.target.closest("button")) return;
     const r = e.target.closest("[data-id]"); if(!r || !listEl.contains(r)) return;
-    if(openRow && openRow!==r) closeOpenRow();
+    if(swipeOpenRow && swipeOpenRow!==r) closeOpenRow();
     row=r; cell=row.querySelector(".cell");
-    const p=getPt(e); sx=p.clientX; sy=p.clientY; curY=p.clientY; t0=Date.now(); mode="pending";
+    const p=getPt(e); sx=p.clientX; sy=p.clientY; curX=p.clientX; curY=p.clientY; t0=Date.now(); mode="pending";
     revealW = opts.swipe==='reveal' ? (opts.actionsWidth||0) : 0;
-    lpTimer=setTimeout(onLongPress, LONGPRESS);
+    lpTimer=setTimeout(startHold, LONGPRESS);
     window.addEventListener("touchmove", onMove, {passive:false});
     window.addEventListener("touchend", onEnd);
     window.addEventListener("touchcancel", onEnd);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
   }
-  function onLongPress(){
+  function startHold(){
     if(mode!=="pending") return;
-    mode="drag"; row.classList.add("dragging"); if(cell) cell.style.transition="";
-    if(navigator.vibrate) navigator.vibrate(12);
+    mode="held"; hx=curX; hy=curY;
+    row.classList.add("dragging"); if(cell) cell.style.transition="";
+    if(navigator.vibrate) navigator.vibrate(10);
     if(opts.folders){
-      slots=[...listEl.querySelectorAll(".row")].map(r=>({el:r,id:r.dataset.id,rect:r.getBoundingClientRect()}));
+      slots=[...listEl.querySelectorAll(rowSel)].map(r=>({el:r,id:r.dataset.id,rect:r.getBoundingClientRect()}));
       const d=slots.find(s=>s.id===row.dataset.id); draggedTop=d.rect.top; grabOffset=curY-draggedTop;
       mergeEl=null; mergeId=null; dropIndex=null;
       dropLine=document.createElement("div"); dropLine.className="drop-line"; dropLine.style.display="none"; listEl.appendChild(dropLine);
     } else grabOffset = curY - row.getBoundingClientRect().top;
   }
   function onMove(e){
-    const p=getPt(e); const dx=p.clientX-sx, dy=p.clientY-sy; curY=p.clientY;
+    const p=getPt(e); const dx=p.clientX-sx, dy=p.clientY-sy; curX=p.clientX; curY=p.clientY;
     if(mode==="pending"){
       if(Math.hypot(dx,dy)>SLOP){
         clearTimeout(lpTimer);
-        if(Math.abs(dx)>Math.abs(dy)){ mode="swipe"; cell.style.transition=""; }
+        if(Math.abs(dx)>Math.abs(dy) && opts.swipe){ mode="swipe"; cell.style.transition=""; }
         else cleanup();
       }
       return;
     }
     if(mode==="swipe"){
       e.preventDefault();
-      let base=(openRow===row)?-revealW:0, tx=base+dx; if(tx>0)tx=0;
+      let base=(swipeOpenRow===row)?-revealW:0, tx=base+dx; if(tx>0)tx=0;
       if(opts.swipe==='reveal' && tx < -revealW-40) tx=-revealW-40;
       cell.style.transform=`translateX(${tx}px)`; return;
+    }
+    if(mode==="held"){
+      e.preventDefault();
+      if(Math.hypot(p.clientX-hx, p.clientY-hy) > HOLD_MOVE) mode="drag";
+      else return;
     }
     if(mode==="drag"){ e.preventDefault(); if(opts.folders) dragFolders(); else dragShuffle(); }
   }
@@ -409,11 +441,16 @@ function attachGestures(listEl, opts){
         dropLine.style.top=(t-listTop)+"px"; dropLine.style.display="block"; }
     }
   }
+  function unlift(){
+    row.style.transform=""; row.classList.remove("dragging");
+    if(dropLine){ dropLine.remove(); dropLine=null; }
+    if(mergeEl){ mergeEl.classList.remove("merge-target"); mergeEl=null; }
+  }
   function onEnd(e){
     clearTimeout(lpTimer);
     if(mode==="pending"){
       const quick = Date.now()-t0 < LONGPRESS;
-      if(openRow) closeOpenRow();
+      if(swipeOpenRow) closeOpenRow();
       else if(quick && opts.onTap) opts.onTap(row.dataset.id);
     } else if(mode==="swipe"){
       const p=getPt(e); const dx=p.clientX-sx;
@@ -424,17 +461,19 @@ function attachGestures(listEl, opts){
           const id=row.dataset.id; setTimeout(()=>opts.onDelete(id),170);
         } else snapBack();
       } else {
-        const base=(openRow===row)?-revealW:0, tx=base+dx;
-        if(tx < -revealW/2){ cell.style.transition="transform .2s"; cell.style.transform=`translateX(${-revealW}px)`; openRow=row; }
-        else { snapBack(); if(openRow===row) openRow=null; }
+        const base=(swipeOpenRow===row)?-revealW:0, tx=base+dx;
+        if(tx < -revealW/2){ cell.style.transition="transform .2s"; cell.style.transform=`translateX(${-revealW}px)`; swipeOpenRow=row; }
+        else { snapBack(); if(swipeOpenRow===row) swipeOpenRow=null; }
       }
+    } else if(mode==="held"){
+      const id=row.dataset.id; unlift();
+      if(opts.onHold) opts.onHold(id); else if(opts.onTap) opts.onTap(id);
     } else if(mode==="drag"){
-      row.classList.remove("dragging"); row.style.transform="";
-      if(opts.folders){
-        if(dropLine){ dropLine.remove(); dropLine=null; }
-        if(mergeEl){ mergeEl.classList.remove("merge-target"); }
-        opts.onDrop({draggedId:row.dataset.id, mergeId:mergeId, index:dropIndex});
-      } else opts.onReorder([...listEl.querySelectorAll("[data-id]")].map(el=>el.dataset.id));
+      const id=row.dataset.id, mid=mergeId, idx=dropIndex;
+      const ids=[...listEl.querySelectorAll("[data-id]")].map(el=>el.dataset.id);
+      unlift();
+      if(opts.folders) opts.onDrop({draggedId:id, mergeId:mid, index:idx});
+      else opts.onReorder(ids);
     }
     cleanup();
   }
@@ -455,36 +494,23 @@ const FOLDER_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="#e0b87
 function normalizeUrl(u){ u=u.trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u; return u; }
 function makeLinkRow(l){
   const row=document.createElement("div"); row.className="row"; row.dataset.id=l.id;
-  const acts=document.createElement("div"); acts.className="actions";
-  const ed=document.createElement("button"); ed.className="act edit"; ed.textContent="編集";
-  ed.addEventListener("click",ev=>{ev.stopPropagation(); closeOpenRow(); openLinkDlg(l.id);});
-  const de=document.createElement("button"); de.className="act del"; de.textContent="削除";
-  de.addEventListener("click",ev=>{ev.stopPropagation(); state.links=state.links.filter(x=>x.id!==l.id); save(); renderWeb();});
-  acts.appendChild(ed); acts.appendChild(de);
   const cell=document.createElement("div"); cell.className="cell";
   const name=document.createElement("div"); name.className="link-name"; name.textContent=l.name;
   const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
-  cell.appendChild(name); cell.appendChild(chev);
-  row.appendChild(acts); row.appendChild(cell); return row;
+  cell.appendChild(name); cell.appendChild(chev); row.appendChild(cell); return row;
 }
 function makeFolderRow(f){
   const row=document.createElement("div"); row.className="row"; row.dataset.id=f.id;
-  const acts=document.createElement("div"); acts.className="actions";
-  const rn=document.createElement("button"); rn.className="act edit"; rn.textContent="名前";
-  rn.addEventListener("click",ev=>{ev.stopPropagation(); closeOpenRow(); openRenameDlg(f.id);});
-  const de=document.createElement("button"); de.className="act del"; de.textContent="削除";
-  de.addEventListener("click",ev=>{ev.stopPropagation(); deleteFolder(f.id);});
-  acts.appendChild(rn); acts.appendChild(de);
   const cell=document.createElement("div"); cell.className="cell";
   const ic=document.createElement("div"); ic.className="fic"; ic.innerHTML=FOLDER_SVG;
   const name=document.createElement("div"); name.className="folder-name"; name.textContent=f.name;
   const cnt=document.createElement("div"); cnt.className="count"; cnt.textContent="("+f.items.length+")";
   const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
   cell.appendChild(ic); cell.appendChild(name); cell.appendChild(cnt); cell.appendChild(chev);
-  row.appendChild(acts); row.appendChild(cell); return row;
+  row.appendChild(cell); return row;
 }
 function renderWeb(){
-  webList.innerHTML=""; openRow=null;
+  webList.innerHTML="";
   if(state.links.length===0){
     const e=document.createElement("div"); e.className="empty"; e.textContent="「＋」でリンクを追加"; webList.appendChild(e);
     document.querySelector('#tab-web .hint').style.visibility="hidden"; return;
@@ -503,9 +529,22 @@ function webTapItem(id){
   if(isFolder(it)) openFolder(id);
   else if(it && it.url) window.open(it.url,"_blank");
 }
+function webHold(id){
+  const it=topById(id); if(!it) return;
+  if(isFolder(it)){
+    showSheet(it.name, [
+      {label:"名前を変更", fn:()=>openRenameDlg(id)},
+      {label:"削除", danger:true, fn:()=>deleteFolder(id)}
+    ]);
+  } else {
+    showSheet(it.name, [
+      {label:"編集", fn:()=>openLinkDlg(id)},
+      {label:"削除", danger:true, fn:()=>{ state.links=state.links.filter(x=>x.id!==id); save(); renderWeb(); }}
+    ]);
+  }
+}
 attachGestures(webList, {
-  swipe:'reveal', actionsWidth:152, folders:true,
-  onTap:(id)=>webTapItem(id),
+  folders:true, onTap:webTapItem, onHold:webHold,
   canMerge:(aId,bId)=>{ const a=topById(aId), b=topById(bId); return isLink(a) && (isLink(b)||isFolder(b)); },
   onDrop:({draggedId,mergeId,index})=>{
     const dIdx=state.links.findIndex(x=>x.id===draggedId); if(dIdx<0) return;
@@ -515,11 +554,7 @@ attachGestures(webList, {
       const tIdx=state.links.findIndex(x=>x.id===mergeId); if(tIdx<0){ state.links.splice(dIdx,0,dragged); return; }
       const target=state.links[tIdx];
       if(isFolder(target)){ target.items.push(dragged); save(); renderWeb(); }
-      else {
-        const nf={id:uid(), name:"フォルダ", items:[target, dragged]};
-        state.links.splice(tIdx,1,nf); save(); renderWeb();
-        openRenameDlg(nf.id, true);   // ask a name right away for a new folder
-      }
+      else { const nf={id:uid(), name:"フォルダ", items:[target, dragged]}; state.links.splice(tIdx,1,nf); save(); renderWeb(); openRenameDlg(nf.id, true); }
       return;
     }
     const others=state.links.filter(x=>x.id!==draggedId);
@@ -535,32 +570,18 @@ const folderList=document.getElementById("folderList");
 const fvTitle=document.getElementById("fvTitle");
 let openFolderId=null;
 function currentFolder(){ return openFolderId? topById(openFolderId) : null; }
-function openFolder(id){
-  const f=topById(id); if(!isFolder(f)) return;
-  openFolderId=id; fvTitle.textContent=f.name; renderFolder(); folderView.classList.add("show");
-}
+function openFolder(id){ const f=topById(id); if(!isFolder(f)) return; openFolderId=id; fvTitle.textContent=f.name; renderFolder(); folderView.classList.add("show"); }
 function closeFolder(){ folderView.classList.remove("show"); openFolderId=null; }
 function renderFolder(){
   const f=currentFolder(); if(!f){ closeFolder(); return; }
-  fvTitle.textContent=f.name;
-  folderList.innerHTML=""; openRow=null;
+  fvTitle.textContent=f.name; folderList.innerHTML="";
   if(f.items.length===0){ const e=document.createElement("div"); e.className="empty"; e.textContent="空のフォルダ"; folderList.appendChild(e); return; }
   f.items.forEach(l=>{
     const row=document.createElement("div"); row.className="row"; row.dataset.id=l.id;
-    const acts=document.createElement("div"); acts.className="actions";
-    const out=document.createElement("button"); out.className="act out"; out.textContent="出す";
-    out.addEventListener("click",ev=>{ev.stopPropagation(); moveOut(l.id);});
-    const ed=document.createElement("button"); ed.className="act edit"; ed.textContent="編集";
-    ed.addEventListener("click",ev=>{ev.stopPropagation(); closeOpenRow(); openLinkDlg(l.id);});
-    const de=document.createElement("button"); de.className="act del"; de.textContent="削除";
-    de.addEventListener("click",ev=>{ev.stopPropagation(); deleteInFolder(l.id);});
-    acts.appendChild(out); acts.appendChild(ed); acts.appendChild(de);
     const cell=document.createElement("div"); cell.className="cell";
     const name=document.createElement("div"); name.className="link-name"; name.textContent=l.name;
     const chev=document.createElement("div"); chev.className="chev"; chev.textContent="›";
-    cell.appendChild(name); cell.appendChild(chev);
-    row.appendChild(acts); row.appendChild(cell);
-    folderList.appendChild(row);
+    cell.appendChild(name); cell.appendChild(chev); row.appendChild(cell); folderList.appendChild(row);
   });
 }
 function afterFolderChange(){
@@ -571,24 +592,23 @@ function afterFolderChange(){
     save(); closeFolder(); renderWeb();
   } else { save(); renderFolder(); renderWeb(); }
 }
-function moveOut(id){
-  const f=currentFolder(); if(!f) return;
-  const i=f.items.findIndex(x=>x.id===id); if(i<0) return;
-  const [l]=f.items.splice(i,1); state.links.push(l);
-  afterFolderChange();
-}
-function deleteInFolder(id){
-  const f=currentFolder(); if(!f) return;
-  f.items=f.items.filter(x=>x.id!==id);
-  afterFolderChange();
+function moveOut(id){ const f=currentFolder(); if(!f) return; const i=f.items.findIndex(x=>x.id===id); if(i<0) return; const [l]=f.items.splice(i,1); state.links.push(l); afterFolderChange(); }
+function deleteInFolder(id){ const f=currentFolder(); if(!f) return; f.items=f.items.filter(x=>x.id!==id); afterFolderChange(); }
+function folderItemHold(id){
+  const l=findLinkAnywhere(id); if(!l) return;
+  showSheet(l.name, [
+    {label:"フォルダから出す", fn:()=>moveOut(id)},
+    {label:"編集", fn:()=>openLinkDlg(id)},
+    {label:"削除", danger:true, fn:()=>deleteInFolder(id)}
+  ]);
 }
 attachGestures(folderList, {
-  swipe:'reveal', actionsWidth:228,
   onTap:(id)=>{ const l=findLinkAnywhere(id); if(l&&l.url) window.open(l.url,"_blank"); },
+  onHold:folderItemHold,
   onReorder:(ids)=>{ const f=currentFolder(); if(f){ f.items=reorderBy(f.items,ids); save(); } }
 });
 document.getElementById("fvBack").addEventListener("click", closeFolder);
-document.getElementById("fvAdd").addEventListener("click", ()=>{ closeOpenRow(); openLinkDlg(null, openFolderId); });
+document.getElementById("fvAdd").addEventListener("click", ()=>{ openLinkDlg(null, openFolderId); });
 fvTitle.addEventListener("click", ()=>{ if(openFolderId) openRenameDlg(openFolderId); });
 
 /* ---------- add / edit link dialog ---------- */
@@ -604,18 +624,14 @@ function openLinkDlg(id, folderId){
   linkMask.classList.add("show"); setTimeout(()=>linkName.focus(),50);
 }
 function closeLinkDlg(){ linkMask.classList.remove("show"); editId=null; addFolderId=null; }
-document.getElementById("webAdd").addEventListener("click", ()=>{ closeOpenRow(); openLinkDlg(); });
+document.getElementById("webAdd").addEventListener("click", ()=>openLinkDlg());
 document.getElementById("linkCancel").addEventListener("click", closeLinkDlg);
 linkMask.addEventListener("click", e=>{ if(e.target===linkMask) closeLinkDlg(); });
 document.getElementById("linkOk").addEventListener("click", ()=>{
   const n=linkName.value.trim(); const u=normalizeUrl(linkUrl.value);
   if(!n && !u) return;
   if(editId){ const l=findLinkAnywhere(editId); if(l){ l.name=n||u; l.url=u; } }
-  else {
-    const item={id:uid(), name:n||u, url:u};
-    if(addFolderId){ const f=topById(addFolderId); if(isFolder(f)) f.items.push(item); }
-    else state.links.push(item);
-  }
+  else { const item={id:uid(), name:n||u, url:u}; if(addFolderId){ const f=topById(addFolderId); if(isFolder(f)) f.items.push(item); } else state.links.push(item); }
   save(); renderWeb(); if(openFolderId) renderFolder(); closeLinkDlg();
 });
 linkName.addEventListener("keydown", e=>{ if(e.key==="Enter") linkUrl.focus(); });
@@ -659,10 +675,7 @@ function renderTodo(){
     cell.appendChild(tx); row.appendChild(bg); row.appendChild(cell); todoList.appendChild(row);
   });
 }
-function addTodo(){
-  const v=todoInput.value.trim(); if(!v) return;
-  state.todos.push({id:uid(), text:v}); todoInput.value=""; save(); renderTodo();
-}
+function addTodo(){ const v=todoInput.value.trim(); if(!v) return; state.todos.push({id:uid(), text:v}); todoInput.value=""; save(); renderTodo(); }
 document.getElementById("todoAddBtn").addEventListener("click", addTodo);
 todoInput.addEventListener("keydown", e=>{ if(e.key==="Enter") addTodo(); });
 attachGestures(todoList, {
@@ -674,8 +687,7 @@ attachGestures(todoList, {
 const todoMask=document.getElementById("todoMask");
 const todoEditInput=document.getElementById("todoEditInput");
 let todoEditId=null;
-function openTodoDlg(id){ const t=state.todos.find(x=>x.id===id); if(!t) return; todoEditId=id; todoEditInput.value=t.text;
-  todoMask.classList.add("show"); setTimeout(()=>todoEditInput.focus(),50); }
+function openTodoDlg(id){ const t=state.todos.find(x=>x.id===id); if(!t) return; todoEditId=id; todoEditInput.value=t.text; todoMask.classList.add("show"); setTimeout(()=>todoEditInput.focus(),50); }
 function closeTodoDlg(){ todoMask.classList.remove("show"); todoEditId=null; }
 document.getElementById("todoCancel").addEventListener("click", closeTodoDlg);
 todoMask.addEventListener("click", e=>{ if(e.target===todoMask) closeTodoDlg(); });
@@ -685,7 +697,7 @@ document.getElementById("todoOk").addEventListener("click", ()=>{
 });
 todoEditInput.addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("todoOk").click(); });
 
-/* ---------- cards (wallet) ---------- */
+/* ---------- subscription cards (wallet) ---------- */
 const cardStack=document.getElementById("cardStack");
 const CARD_COLORS=["#3a6ea5","#c0562f","#4b8b6f","#6a5acd","#b5843a","#4a4a4a","#a63a5b","#2f7d8f"];
 let expandedCard=null;
@@ -698,7 +710,7 @@ function fmtAmount(a){
 function renderCards(){
   cardStack.innerHTML="";
   if(state.cards.length===0){
-    const e=document.createElement("div"); e.className="empty"; e.textContent="「＋」でカードを追加"; cardStack.appendChild(e);
+    const e=document.createElement("div"); e.className="empty"; e.textContent="「＋」でサブスクを追加"; cardStack.appendChild(e);
     document.querySelector('#tab-cards .hint').style.visibility="hidden"; return;
   }
   document.querySelector('#tab-cards .hint').style.visibility="visible";
@@ -707,21 +719,26 @@ function renderCards(){
     el.style.background=c.color||"#4a4a4a"; el.dataset.id=c.id;
     const head=document.createElement("div"); head.className="wc-head";
     const co=document.createElement("div"); co.className="wc-company"; co.textContent=c.company||"（会社名なし）";
-    const am=document.createElement("div"); am.className="wc-amount"; am.textContent=fmtAmount(c.amount);
-    head.appendChild(co); head.appendChild(am);
+    const ti=document.createElement("div"); ti.className="wc-title"; ti.textContent=c.item||"（品名なし）";
+    head.appendChild(co); head.appendChild(ti);
     const body=document.createElement("div"); body.className="wc-body";
-    if(c.item){ const it=document.createElement("div"); it.className="wc-item"; it.textContent="品名："+c.item; body.appendChild(it); }
+    if(c.amount){ const am=document.createElement("div"); am.className="wc-amount"; am.textContent="金額："+fmtAmount(c.amount); body.appendChild(am); }
     if(c.memo){ const mm=document.createElement("div"); mm.className="wc-memo"; mm.textContent=c.memo; body.appendChild(mm); }
     const acts=document.createElement("div"); acts.className="wc-actions";
     const ed=document.createElement("button"); ed.textContent="編集"; ed.addEventListener("click",ev=>{ev.stopPropagation(); openCardDlg(c.id);});
     const de=document.createElement("button"); de.textContent="削除"; de.addEventListener("click",ev=>{ev.stopPropagation();
-      if(confirm("このカードを削除しますか？")){ state.cards=state.cards.filter(x=>x.id!==c.id); if(expandedCard===c.id)expandedCard=null; save(); renderCards(); } });
+      if(confirm("このサブスクを削除しますか？")){ state.cards=state.cards.filter(x=>x.id!==c.id); if(expandedCard===c.id)expandedCard=null; save(); renderCards(); } });
     acts.appendChild(ed); acts.appendChild(de); body.appendChild(acts);
     el.appendChild(head); el.appendChild(body);
-    el.addEventListener("click",()=>{ expandedCard = (expandedCard===c.id)? null : c.id; renderCards(); });
     cardStack.appendChild(el);
   });
 }
+function toggleCard(id){ expandedCard = (expandedCard===id)? null : id; renderCards(); }
+attachGestures(cardStack, {
+  rowSelector:".wcard",
+  onTap:toggleCard, onHold:toggleCard,
+  onReorder:(ids)=>{ state.cards=reorderBy(state.cards,ids); save(); }
+});
 /* card dialog */
 const cardMask=document.getElementById("cardMask");
 const cCompany=document.getElementById("cCompany"), cItem=document.getElementById("cItem"),
@@ -737,7 +754,7 @@ function paintSwatches(){ cSwatches.querySelectorAll(".sw").forEach(x=>x.classLi
 function openCardDlg(id){
   cardEditId=id||null;
   const c=id? state.cards.find(x=>x.id===id) : null;
-  document.getElementById("cardDlgTitle").textContent = c? "カードを編集" : "カードを追加";
+  document.getElementById("cardDlgTitle").textContent = c? "サブスクを編集" : "サブスクを追加";
   cCompany.value=c?c.company:""; cItem.value=c?(c.item||""):""; cAmount.value=c?(c.amount||""):""; cMemo.value=c?(c.memo||""):"";
   cardColor = c? (c.color||CARD_COLORS[0]) : CARD_COLORS[state.cards.length % CARD_COLORS.length];
   paintSwatches();
