@@ -45,7 +45,6 @@
   .ct-reset{margin-top:26px;background:none;border:none;color:var(--blue);font-size:16px;cursor:pointer;padding:6px 16px;}
   .ct-reset:active{opacity:.6;}
   .ct-when{margin-top:18px;color:var(--gray);font-size:15px;}
-  .ver{margin-top:10px;color:#c7c7cc;font-size:12px;}
 
   .hdr{padding:8px 18px 4px;}
   .hdr-row{display:flex;align-items:center;justify-content:space-between;min-height:34px;}
@@ -156,7 +155,6 @@
   </div>
   <button class="ct-reset" id="ctReset">リセット</button>
   <div class="ct-when" id="ctWhen">更新日時：—</div>
-  <div class="ver" id="ver"></div>
 </section>
 
 <section id="tab-web" class="panel">
@@ -841,8 +839,7 @@ registerSW();
 
 /* auto-update: if the deployed version differs, reload once to fetch the latest.
    Beats iOS Home-Screen HTML caching without needing to remove/re-add the app. */
-const APP_VERSION="12";
-document.getElementById("ver").textContent="v"+APP_VERSION;
+const APP_VERSION="13";
 fetch("version.json?"+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(d=>{
   if(d && d.v && d.v!==APP_VERSION){
     const k="upd_"+d.v;
